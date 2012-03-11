@@ -8,4 +8,8 @@ public interface IRenderable {
 
 	public abstract int indicesBufferRequirement();
 
+	public abstract boolean isVisible();
+
+	public abstract void isVisible(boolean flag);
+
 }

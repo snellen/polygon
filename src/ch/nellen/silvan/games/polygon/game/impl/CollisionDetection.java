@@ -20,7 +20,7 @@ public class CollisionDetection implements ICollisionDetection {
 	}
 
 	private boolean checkCollision(PlayerModel player, PolygonUnfilled candidate) {
-		if (player.getRadius() + player.getSize() > candidate.getRadius()) {
+		if (candidate.isVisible() && (player.getRadius() + player.getSize() > candidate.getRadius())) {
 			float relativeAngle = player.getAngle() - candidate.getAngle();
 			if (relativeAngle < 0f) {
 				relativeAngle += 360f;

@@ -8,7 +8,7 @@ import javax.microedition.khronos.opengles.GL10;
 import ch.nellen.silvan.games.polygon.graphics.IPlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
-public class PlayerModel implements IPlayerModel {
+public class PlayerModel extends Renderable implements IPlayerModel {
 
 	
 	private float mRadius;

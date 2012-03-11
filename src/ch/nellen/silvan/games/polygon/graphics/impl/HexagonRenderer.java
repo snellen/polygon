@@ -65,10 +65,13 @@ public class HexagonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 		// Render
 		mRenderContext.setGl(gl);
-		for(int i= 0;i < mRenderables.size();++i) {
-			gl.glPushMatrix();
-			mRenderables.get(i).render(mRenderContext);
-			gl.glPopMatrix();
+		for (int i = 0; i < mRenderables.size(); ++i) {
+			IRenderable r = mRenderables.get(i);
+			if (r.isVisible()) {
+				gl.glPushMatrix();
+				r.render(mRenderContext);
+				gl.glPopMatrix();
+			}
 		}
 	}
 
@@ -97,7 +100,8 @@ public class HexagonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		mRenderables.remove(r);
 	}
 
-	public void handleTouchEvent(float screenWidth, float screenHeight, final MotionEvent event) {
+	public void handleTouchEvent(float screenWidth, float screenHeight,
+			final MotionEvent event) {
 		mGameState.onTouchEvent(screenWidth, screenHeight, event);
 	}
 

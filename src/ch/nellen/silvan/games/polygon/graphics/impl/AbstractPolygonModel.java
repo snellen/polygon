@@ -4,7 +4,7 @@ import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 
 
-public abstract class AbstractPolygonModel implements IRenderable, IPolygonModel {
+public abstract class AbstractPolygonModel extends Renderable implements IRenderable, IPolygonModel {
 
 	// Cache for precalculated corner coordinates
 	// Dimension 1: Vertices
