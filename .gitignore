@@ -1,4 +1,5 @@
 .project
-.setings
+.settings
 bin
 gen
+.classpath
