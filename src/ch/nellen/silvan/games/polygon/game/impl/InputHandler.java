@@ -1,11 +1,13 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
 
 public class InputHandler implements IInputHandler {
 
 	private int mAngleDir = 0;
+	private boolean mPause = false;
 
 	@Override
 	public void handleMotionEvent(float screenWidth, float screenHeight,
@@ -23,6 +25,18 @@ public class InputHandler implements IInputHandler {
 	@Override
 	public int currentPlayerAngluarDir() {
 		return mAngleDir;
+	}
+
+	@Override
+	public void handleKeyUpEvent(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			mPause = !mPause;
+		}
+	}
+
+	@Override
+	public boolean pauseState() {
+		return mPause;
 	}
 
 }

@@ -20,6 +20,9 @@ public class RenderContext implements IRenderContext {
 	private GL10 mGl = null;
 	private IRenderer mRenderer;
 	
+	private FloatBuffer vBuffer;
+	private ShortBuffer iBuffer;
+
 	public RenderContext(IRenderer renderer) {
 		super();
 		this.mRenderer = renderer;
@@ -28,15 +31,29 @@ public class RenderContext implements IRenderContext {
 	@Override
 	public void registerVertexBuffer(int size) {
 		/* Initialize vertex buffer */
-		if (mVertexBuffer == null || mVertexBuffer.length < size)
+		if (mVertexBuffer == null || mVertexBuffer.length < size) {
 			mVertexBuffer = new float[size];
+			// (# of coordinate values * 4 bytes per float)
+			ByteBuffer vbb = ByteBuffer.allocateDirect(mVertexBuffer.length * 4);
+
+			vbb.order(ByteOrder.nativeOrder());// use the device hardware's native
+												// byte order
+			vBuffer = vbb.asFloatBuffer(); // create a floating point buffer from
+											// the ByteBuffer
+			
+		}
 	}
 
 	@Override
 	public void registerIndicesBuffer(int size) {
 		/* Initialize indices buffer */
-		if (mIndicesBuffer == null || mIndicesBuffer.length < size)
+		if (mIndicesBuffer == null || mIndicesBuffer.length < size) {
 			mIndicesBuffer = new short[size];
+			ByteBuffer idb = ByteBuffer.allocateDirect(mIndicesBuffer.length * 2);
+			idb.order(ByteOrder.nativeOrder());
+			
+			iBuffer = idb.asShortBuffer();
+		}
 	}
 
 	public float[] getVertexBuffer() {
@@ -48,24 +65,14 @@ public class RenderContext implements IRenderContext {
 	}
 
 	public FloatBuffer getGlVertexBuffer() {
-		FloatBuffer vBuffer;
-		// (# of coordinate values * 4 bytes per float)
-		ByteBuffer vbb = ByteBuffer.allocateDirect(mVertexBuffer.length * 4);
-
-		vbb.order(ByteOrder.nativeOrder());// use the device hardware's native
-											// byte order
-		vBuffer = vbb.asFloatBuffer(); // create a floating point buffer from
-										// the ByteBuffer
+		vBuffer.position(0);
 		vBuffer.put(mVertexBuffer); // add the coordinates to the FloatBuffer
 		vBuffer.position(0); // set the buffer to read the first coordinate
 		return vBuffer;
 	}
 
 	public ShortBuffer getGlIndicesBuffer() {
-		ByteBuffer idb = ByteBuffer.allocateDirect(mIndicesBuffer.length * 2);
-		idb.order(ByteOrder.nativeOrder());
-		ShortBuffer iBuffer;
-		iBuffer = idb.asShortBuffer();
+		iBuffer.position(0);
 		iBuffer.put(mIndicesBuffer);
 		iBuffer.position(0);
 		return iBuffer;
