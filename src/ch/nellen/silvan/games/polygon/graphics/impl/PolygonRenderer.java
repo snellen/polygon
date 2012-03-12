@@ -28,7 +28,7 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import ch.nellen.silvan.games.polygon.graphics.IScene;
 
-public class HexagonRenderer implements GLSurfaceView.Renderer, IRenderer {
+public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 	private IRenderContext mRenderContext = null;
 	private Vector<IRenderable> mRenderables = new Vector<IRenderable>(16);
@@ -37,7 +37,7 @@ public class HexagonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private IScene mScene = null;
 	private IInputHandler mInputHandler = null;
 
-	public HexagonRenderer() {
+	public PolygonRenderer() {
 		super();
 		mRenderContext = new RenderContext(this);
 		mScene = new Scene(mRenderContext);

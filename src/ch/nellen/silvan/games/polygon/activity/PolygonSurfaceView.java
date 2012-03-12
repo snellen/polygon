@@ -1,14 +1,14 @@
 package ch.nellen.silvan.games.polygon.activity;
 
-import ch.nellen.silvan.games.polygon.graphics.impl.HexagonRenderer;
+import ch.nellen.silvan.games.polygon.graphics.impl.PolygonRenderer;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
-public class HexagonSurfaceView extends GLSurfaceView {
+public class PolygonSurfaceView extends GLSurfaceView {
 
-	private HexagonRenderer mRenderer = null;
+	private PolygonRenderer mRenderer = null;
 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
@@ -31,10 +31,10 @@ public class HexagonSurfaceView extends GLSurfaceView {
 		return true;
 	}
 
-	public HexagonSurfaceView(Context context) {
+	public PolygonSurfaceView(Context context) {
 		super(context);
 
-		mRenderer = new HexagonRenderer();
+		mRenderer = new PolygonRenderer();
 
 		// Set the Renderer for drawing on the GLSurfaceView
 		setRenderer(mRenderer);

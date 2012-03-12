@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class HexagonActivity extends Activity {
+public class PolygonActivity extends Activity {
 	private GLSurfaceView mGLView;
 
 	@Override
@@ -20,7 +20,7 @@ public class HexagonActivity extends Activity {
 
 		// Create a GLSurfaceView instance and set it
 		// as the ContentView for this Activity.
-		mGLView = new HexagonSurfaceView(this);
+		mGLView = new PolygonSurfaceView(this);
 		setContentView(mGLView);
 	}
 
