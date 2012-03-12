@@ -57,7 +57,7 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 			vertexBuffer[iBase + 1] = triangleCoords[iBase+1]; // Yi.1
 			vertexBuffer[iBase + 2] = mZCoord; // Zi.1
 		}
-		indicesBuffer[0] = 0; 
+		indicesBuffer[0] = 0;
 		indicesBuffer[1] = 1;
 		indicesBuffer[2] = 2;
 	}
@@ -75,6 +75,11 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 	public float getSize() {
 		return SIZE;
 	}
+	
+	public float getTangentialSize() {
+		return triangleCoords[4];
+	}
+	
 	@Override
 	public void setAngle(float angle) {
 		mAngle = angle;
