@@ -1,10 +1,9 @@
 package ch.nellen.silvan.games.polygon.activity;
 
-import ch.nellen.silvan.games.polygon.graphics.impl.PolygonRenderer;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
+import ch.nellen.silvan.games.polygon.graphics.impl.PolygonRenderer;
 
 public class PolygonSurfaceView extends GLSurfaceView {
 
@@ -19,16 +18,6 @@ public class PolygonSurfaceView extends GLSurfaceView {
 		});
 		return true;
 
-	}
-
-	@Override
-	public boolean onKeyUp(final int keyCode, final KeyEvent event) {
-		queueEvent(new Runnable() {
-			public void run() {
-				mRenderer.handleKeyUpEvent(keyCode, event);
-			}
-		});
-		return true;
 	}
 
 	public PolygonSurfaceView(Context context) {

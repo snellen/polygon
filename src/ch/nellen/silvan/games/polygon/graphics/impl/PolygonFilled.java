@@ -13,7 +13,7 @@ public class PolygonFilled extends AbstractPolygonModel {
 
 	public PolygonFilled(IRenderContext rc) {
 		super();
-		rc.getRenderer().registerRenderable(this);
+		rc.getRenderer().registerRenderable3D(this);
 		mColor = new RGBAColor(0f, 0f, 0f, 1f);
 	}
 
@@ -45,7 +45,7 @@ public class PolygonFilled extends AbstractPolygonModel {
 			
 			indicesBuffer[iBase] = NUMBER_OF_VERTICES; // center point at last position
 			indicesBuffer[iBase + 1] = (short) i;
-			indicesBuffer[iBase + 2] = (short) (((short)(i+1))%6);
+			indicesBuffer[iBase + 2] = (short) (((short)(i+1))%NUMBER_OF_VERTICES);
 		}
 		// Center point
 		iBase = NUMBER_OF_VERTICES*3;

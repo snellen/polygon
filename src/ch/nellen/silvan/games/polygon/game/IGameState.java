@@ -1,9 +1,13 @@
 package ch.nellen.silvan.games.polygon.game;
 
-
-
-
 public interface IGameState {
-	// Update game state based on the time elapsed since the last update
-	public void update(long timeElapsed);
+
+	public abstract void setAngularDir(int mAngularDir);
+
+	public abstract void setPauseState(boolean mPauseState);
+
+	public abstract int currentPlayerAngluarDir();
+
+	public abstract boolean pauseState();
+
 }

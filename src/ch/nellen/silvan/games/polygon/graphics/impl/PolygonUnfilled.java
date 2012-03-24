@@ -15,7 +15,7 @@ public class PolygonUnfilled extends AbstractPolygonModel {
 
 	public PolygonUnfilled(IRenderContext rc) {
 		super();
-		rc.getRenderer().registerRenderable(this);
+		rc.getRenderer().registerRenderable3D(this);
 		/* Init number of edges enabled */
 		boolean[] edgeEnabled = new boolean[NUMBER_OF_VERTICES];
 		for (int i = 0; i < NUMBER_OF_VERTICES; ++i)

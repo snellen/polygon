@@ -1,27 +1,21 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.opengl.GLUtils;
 import android.os.SystemClock;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
+import ch.nellen.silvan.games.polygon.game.IGameLogic;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
+import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
 import ch.nellen.silvan.games.polygon.game.impl.GameState;
-import ch.nellen.silvan.games.polygon.game.impl.InputHandler;
+import ch.nellen.silvan.games.polygon.game.impl.HeadsUpDisplay;
+import ch.nellen.silvan.games.polygon.game.impl.GameController;
 import ch.nellen.silvan.games.polygon.game.impl.Scene;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
@@ -31,18 +25,23 @@ import ch.nellen.silvan.games.polygon.graphics.IScene;
 public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 	private IRenderContext mRenderContext = null;
-	private Vector<IRenderable> mRenderables = new Vector<IRenderable>(16);
-	private IGameState mGameState = null;
+	private Vector<IRenderable> mRenderables3D = new Vector<IRenderable>(16);
+	private Vector<IRenderable> mRenderables2D = new Vector<IRenderable>(16);
+	private IGameLogic mGameLogic = null;
 	long lastUpdate = 0;
 	private IScene mScene = null;
-	private IInputHandler mInputHandler = null;
+	private IInputHandler mGameController = null;
+	private HeadsUpDisplay mHud = null;
+	private IGameState mGameState = null;
 
 	public PolygonRenderer() {
 		super();
+		mGameState = new GameState();
 		mRenderContext = new RenderContext(this);
 		mScene = new Scene(mRenderContext);
-		mInputHandler = new InputHandler();
-		mGameState = new GameState(mScene, mInputHandler);
+		mHud = new HeadsUpDisplay(mRenderContext, mGameState);
+		mGameController = new GameController(mGameState);
+		mGameLogic = new GameLogic(mScene, mGameState);
 	}
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -66,99 +65,63 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		if (lastUpdate != 0)
 			timeElapsed = currTime - lastUpdate;
 
-		mGameState.update(timeElapsed);
+		mGameLogic.update(timeElapsed);
 
 		lastUpdate = currTime;
 
 		/* Render 3D */
+
 		// Redraw background color
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		// Set GL_MODELVIEW transformation mode
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
-		gl.glLoadIdentity(); // reset the matrix to its default state
-		// When using GL_MODELVIEW, you must set the view point
+		gl.glLoadIdentity();
 		GLU.gluLookAt(gl, 0, 0, 5, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 		mRenderContext.setGl(gl);
-		for (int i = 0; i < mRenderables.size(); ++i) {
-			IRenderable r = mRenderables.get(i);
+		for (int i = 0; i < mRenderables3D.size(); ++i) {
+			IRenderable r = mRenderables3D.get(i);
 			if (r.isVisible()) {
 				gl.glPushMatrix();
 				r.render(mRenderContext);
 				gl.glPopMatrix();
 			}
 		}
-		/*
-		/* Render 2D 
+
+		/* Render 2D */
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		gl.glOrthof (0, mScreenWidth, mScreenHeight, 0, 0, 1);
+		gl.glOrthof(0, mScreenWidth, mScreenHeight, 0, -1, 1);
 		gl.glDisable(GL10.GL_DEPTH_TEST);
-		gl.glMatrixMode (GL10.GL_MODELVIEW);
+
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		
-		FloatBuffer triangleVB;
-        float triangleCoords[] = {
-                // X, Y, Z
-                50f, 250f, 0,
-                150f, 250f, 0,
-                100f,  355.9016994f, 0
-            }; 
-            
-            // initialize vertex Buffer for triangle  
-            ByteBuffer vbb = ByteBuffer.allocateDirect(
-                    // (# of coordinate values * 4 bytes per float)
-                    triangleCoords.length * 4); 
-            vbb.order(ByteOrder.nativeOrder());// use the device hardware's native byte order
-            triangleVB = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
-            triangleVB.put(triangleCoords);    // add the coordinates to the FloatBuffer
-            triangleVB.position(0);  
-            // Draw the triangle
-            gl.glColor4f(0.63671875f, 0.76953125f, 0.22265625f, 0.0f);
-            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, triangleVB);
-            gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
-		
-	
-		// Create an empty, mutable bitmap
-		Bitmap bitmap = Bitmap.createBitmap(mScreenWidth, mScreenHeight, Bitmap.Config.ARGB_4444);
-		// get a canvas to paint over the bitmap
-		Canvas canvas = new Canvas(bitmap);
-		bitmap.eraseColor(0);
 
-		// Draw the text
-		Paint textPaint = new Paint();
-		textPaint.setTextSize(32);
-		textPaint.setAntiAlias(true);
-		textPaint.setARGB(0xff, 0xff, 0xff, 0xff);
-		// draw the text centered
-		canvas.drawText("Hello World", 160,312, textPaint);
- 
-		//Generate one texture pointer...
-		gl.glGenTextures(1, textures, 0);
-		//...and bind it to our array
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+		gl.glEnable(GL10.GL_TEXTURE_2D);
+		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
-		//Create Nearest Filtered Texture
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+		gl.glEnable(GL10.GL_BLEND);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
-		//Different possible texture parameters, e.g. GL10.GL_CLAMP_TO_EDGE
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT);
+		gl.glColor4f(1f, 1f, 1f, 1f);
 
-		//Use the Android GLUtils to specify a two-dimensional texture image from our bitmap
-		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+		for (int i = 0; i < mRenderables2D.size(); ++i) {
+			IRenderable r = mRenderables2D.get(i);
+			if (r.isVisible()) {
+				gl.glPushMatrix();
+				r.render(mRenderContext);
+				gl.glPopMatrix();
+			}
+		}
 
-		//Clean up
-		bitmap.recycle();
-		
-		
+		/* End Render 2D */
+		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		gl.glDisable(GL10.GL_TEXTURE_2D);
+		gl.glDisable(GL10.GL_BLEND);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		gl.glPopMatrix();
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPopMatrix();
-		*/
 
 	}
 
@@ -176,26 +139,34 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	}
 
 	@Override
-	public void registerRenderable(IRenderable r) {
-		if (!mRenderables.contains(r)) {
+	public void registerRenderable3D(IRenderable r) {
+		if (!mRenderables3D.contains(r)) {
 			mRenderContext.registerIndicesBuffer(r.indicesBufferRequirement());
 			mRenderContext.registerVertexBuffer(r.vertexBufferRequirement());
-			mRenderables.add(r);
+			mRenderables3D.add(r);
+		}
+	}
+
+	@Override
+	public void registerRenderable2D(IRenderable r) {
+		if (!mRenderables2D.contains(r)) {
+			mRenderContext.registerIndicesBuffer(r.indicesBufferRequirement());
+			mRenderContext.registerVertexBuffer(r.vertexBufferRequirement());
+			mRenderables2D.add(r);
 		}
 	}
 
 	@Override
 	public void unregisterRenderable(IRenderable r) {
-		mRenderables.remove(r);
+		if (mRenderables3D.contains(r))
+			mRenderables3D.remove(r);
+		if (mRenderables2D.contains(r))
+			mRenderables2D.remove(r);
 	}
 
 	public void handleTouchEvent(float screenWidth, float screenHeight,
 			final MotionEvent event) {
-		mInputHandler.handleMotionEvent(screenWidth, screenHeight, event);
+		if (!mHud.handleMotionEvent(screenWidth, screenHeight, event))
+			mGameController.handleMotionEvent(screenWidth, screenHeight, event);
 	}
-
-	public void handleKeyUpEvent(int keyCode, KeyEvent event) {
-		mInputHandler.handleKeyUpEvent(keyCode, event);
-	}
-
 }
