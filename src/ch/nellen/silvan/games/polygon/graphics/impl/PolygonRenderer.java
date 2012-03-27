@@ -9,7 +9,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.SystemClock;
 import android.view.MotionEvent;
-import ch.nellen.silvan.games.polygon.game.IGameLogic;
+import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
 import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
@@ -27,18 +27,21 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private IRenderContext mRenderContext = null;
 	private Vector<IRenderable> mRenderables3D = new Vector<IRenderable>(16);
 	private Vector<IRenderable> mRenderables2D = new Vector<IRenderable>(16);
-	private IGameLogic mGameLogic = null;
+	private IUpdatable mGameLogic = null;
 	long lastUpdate = 0;
 	private IScene mScene = null;
 	private IInputHandler mGameController = null;
 	private HeadsUpDisplay mHud = null;
 	private IGameState mGameState = null;
+	private int mScreenWidth;
+	private int mScreenHeight;
 
 	public PolygonRenderer() {
 		super();
-		mGameState = new GameState();
 		mRenderContext = new RenderContext(this);
 		mScene = new Scene(mRenderContext);
+		
+		mGameState = new GameState();
 		mHud = new HeadsUpDisplay(mRenderContext, mGameState);
 		mGameController = new GameController(mGameState);
 		mGameLogic = new GameLogic(mScene, mGameState);
@@ -54,10 +57,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 	}
 
-	int[] textures = new int[4];
-	private int mScreenWidth;
-	private int mScreenHeight;
-
 	public void onDrawFrame(GL10 gl) {
 		// Update game state
 		long currTime = SystemClock.uptimeMillis();
@@ -66,6 +65,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 			timeElapsed = currTime - lastUpdate;
 
 		mGameLogic.update(timeElapsed);
+		mHud.update(timeElapsed);
 
 		lastUpdate = currTime;
 
@@ -75,7 +75,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
-		GLU.gluLookAt(gl, 0, 0, 5, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+		GLU.gluLookAt(gl, 0, 0, mGameState.getCameraZ(), 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 		mRenderContext.setGl(gl);
 		for (int i = 0; i < mRenderables3D.size(); ++i) {
 			IRenderable r = mRenderables3D.get(i);
@@ -128,6 +128,9 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		mScreenWidth = width;
 		mScreenHeight = height;
+		
+		mHud.onScreenChanged(mScreenWidth, mScreenHeight);
+		
 		gl.glViewport(0, 0, width, height);
 
 		// make adjustments for screen ratio

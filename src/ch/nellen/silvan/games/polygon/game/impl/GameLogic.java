@@ -1,7 +1,7 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import ch.nellen.silvan.games.polygon.game.ICollisionDetection;
-import ch.nellen.silvan.games.polygon.game.IGameLogic;
+import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.IScene;
@@ -9,7 +9,11 @@ import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
 import ch.nellen.silvan.games.polygon.graphics.impl.RGBAColor;
 
-public class GameLogic implements IGameLogic {
+public class GameLogic implements IUpdatable {
+
+	private static final float PAUSE_CAM_POSITION = 3.1f;
+	private static final float CAM_POSITION = 5f;
+	private static final float CAM_SPEED = 4f / 1000;
 
 	private float mAngle = 0f;
 	private float rotationSpeed = 0.04f;
@@ -27,6 +31,9 @@ public class GameLogic implements IGameLogic {
 		collDec = new CollisionDetection();
 		mGameState = gameState;
 		mScene = scene;
+
+		mGameState.setPaused(true);
+		mGameState.setCameraZ(PAUSE_CAM_POSITION);
 	}
 
 	public float getShrinkSpeed() {
@@ -57,14 +64,36 @@ public class GameLogic implements IGameLogic {
 
 	public void update(long timeElapsed) {
 
-		if (!this.mGameState.pauseState()) {
+		float camPosition = mGameState.getCameraZ();
+		float targetPos = mGameState.getPaused() ? PAUSE_CAM_POSITION
+				: CAM_POSITION;
+
+		if (Math.abs(camPosition - targetPos) > 0.0001) {
+			// Move camera towards target position
+			float dPosition = Math.signum(targetPos - camPosition) * CAM_SPEED
+					* timeElapsed;
+			if (Math.signum(targetPos - camPosition) != Math.signum(targetPos
+					- camPosition - dPosition)) {
+				camPosition = targetPos;
+			} else {
+				camPosition += dPosition;
+			}
+			mGameState.setCameraZ(camPosition);
+		}
+
+		mScene.getPlayerModel().isVisible(!mGameState.getPaused());
+		
+		if (!mGameState.getPaused()) {
 			totalTime += timeElapsed;
+			mGameState.setTimeElapsed(totalTime);
+		}
 
-			updateAngle(timeElapsed);
+		updateAngle(timeElapsed);
 
-			PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
-			// Update polygons
-			for (int i = 0; i < mPolygonModels.length; ++i) {
+		PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
+		// Update polygons
+		for (int i = 0; i < mPolygonModels.length; ++i) {
+			if (!mGameState.getPaused()) {
 				float r = mPolygonModels[i].getRadius() - shrinkSpeed
 						* timeElapsed;
 				if (r < 0.1) {
@@ -74,27 +103,29 @@ public class GameLogic implements IGameLogic {
 					mPolygonModels[i].setEdgesActive(edgeEnabled);
 				}
 				mPolygonModels[i].setRadius(r);
-				mPolygonModels[i].setAngle(mAngle);
 			}
+			mPolygonModels[i].setAngle(mAngle);
+		}
 
-			// Update center
-			mScene.getCenterPolygonBorder().setAngle(mAngle);
-			mScene.getCenterPolygon().setAngle(mAngle);
+		// Update center
+		mScene.getCenterPolygonBorder().setAngle(mAngle);
+		mScene.getCenterPolygon().setAngle(mAngle);
 
-			// Update player
-			PlayerModel playerModel = mScene.getPlayerModel();
-			float playerAngle = playerModel.getAngle();
-			playerAngle += mGameState.currentPlayerAngluarDir()
-					* playerSpeed * timeElapsed;
-			playerAngle += rotationSpeed * timeElapsed;
-			playerModel.setAngle(playerAngle);
+		// Update player
+		PlayerModel playerModel = mScene.getPlayerModel();
+		float playerAngle = playerModel.getAngle();
+		if (!mGameState.getPaused()) {
+			playerAngle += mGameState.getPlayerAngluarDir() * playerSpeed
+					* timeElapsed;
+		}
+		playerAngle += rotationSpeed * timeElapsed;
+		playerModel.setAngle(playerAngle);
 
-			// Collision
-			if (collDec.isPlayerCollided(mScene)) {
-				playerModel.setColor(new RGBAColor(0f, 0f, 1f, 1.0f));
-			} else {
-				playerModel.setColor(new RGBAColor(1f, 0f, 0f, 1.0f));
-			}
+		// Collision
+		if (collDec.isPlayerCollided(mScene)) {
+			playerModel.setColor(new RGBAColor(0f, 0f, 1f, 1.0f));
+		} else {
+			playerModel.setColor(new RGBAColor(1f, 0f, 0f, 1.0f));
 		}
 	}
 }

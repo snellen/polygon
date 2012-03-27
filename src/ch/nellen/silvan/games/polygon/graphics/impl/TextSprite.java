@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
+import android.graphics.Typeface;
 import android.opengl.GLUtils;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
@@ -60,6 +61,7 @@ public class TextSprite implements ITextSprite {
 		mTextPaint.setAntiAlias(true);
 		mTextPaint.setColor(Color.BLACK);
 		mTextPaint.setTextAlign(Paint.Align.LEFT);
+		mTextPaint.setTypeface(Typeface.DEFAULT);
 
 		mTextureId[0] = -1;
 	}
@@ -217,7 +219,6 @@ public class TextSprite implements ITextSprite {
 				bitmap = Bitmap.createBitmap(width, height,
 						Bitmap.Config.ARGB_8888);
 				canvas = new Canvas(bitmap);
-				bitmap.eraseColor(mBackgroundColor);
 				/* Quad */
 				squareCoords[3] = height;
 				squareCoords[4] = width;
@@ -231,6 +232,8 @@ public class TextSprite implements ITextSprite {
 				mVertexBuffer.position(0);
 			}
 
+			bitmap.eraseColor(mBackgroundColor);
+			
 			FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 			canvas.drawText(mText, mPaddingH, Math.abs(fontMetrics.ascent)
 					+ mPaddingV, mTextPaint);
