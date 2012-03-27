@@ -31,6 +31,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pauseButton.setY(20);
 		pauseButton.setTextSize(32);
 		pauseButton.setText("PAUSE");
+		pauseButton.setPaddingHorizontal(10);
 		rc.getRenderer().registerRenderable2D(pauseButton);
 
 		totalTime = new TextSprite();
@@ -38,6 +39,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		totalTime.setTextColor(background | 0xff000000);
 		totalTime.setTextSize(32);
 		totalTime.setText("TIME: 00:0");
+		totalTime.setPaddingHorizontal(5);
 		rc.getRenderer().registerRenderable2D(totalTime);
 
 		pausedText = new TextSprite();
@@ -55,21 +57,23 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		float evX = event.getX();
 		float evY = event.getY();
 
-		if (pauseButton.isVisible() && evX > pauseButton.getX()
-				&& evX < pauseButton.getX() + pauseButton.getWidth()
-				&& evY > pauseButton.getY()
-				&& evY < pauseButton.getY() + pauseButton.getHeight()) {
-			// Touch on pause button
-			if (event.getAction() == MotionEvent.ACTION_UP) {
-				// Pause button released
-				mGameState.setPaused(true);
+		if (mGameState.getPausedChangeable()) {
+			if (pauseButton.isVisible() && evX > pauseButton.getX()
+					&& evX < pauseButton.getX() + pauseButton.getWidth()
+					&& evY > pauseButton.getY()
+					&& evY < pauseButton.getY() + pauseButton.getHeight()) {
+				// Touch on pause button
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					// Pause button released
+					mGameState.setPaused(true);
+				}
+				return true; // Event handled
 			}
-			return true; // Event handled
-		}
 
-		if (mGameState.getPaused()) {
-			mGameState.setPaused(false);
-			return true;
+			if (mGameState.getPaused()) {
+				mGameState.setPaused(false);
+				return true;
+			}
 		}
 
 		return false;
@@ -80,20 +84,20 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 
 		String timeString;
 		long time = mGameState.getTimeElapsed();
-		timeString = "TIME: "+Long.toString((time / 1000)) + ":"
+		timeString = "TIME: " + Long.toString((time / 1000)) + ":"
 				+ Long.toString((time / 100) % 10);
 		totalTime.setText(timeString);
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 
 		pausedText.isVisible(mGameState.getPaused());
-		pauseButton.isVisible(!mGameState.getPaused());
+		pauseButton.isVisible(mGameState.getPausedChangeable() && !mGameState.getPaused());
 
 	}
 
 	public void onScreenChanged(int screenWidth, int screenHeight) {
 		mScreenWidth = screenWidth;
 		mScreenHeight = screenHeight;
-		
+
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setY(20);
 

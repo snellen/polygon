@@ -34,6 +34,7 @@ public class GameLogic implements IUpdatable {
 
 		mGameState.setPaused(true);
 		mGameState.setCameraZ(PAUSE_CAM_POSITION);
+		mGameState.setPausedChangeable(true);
 	}
 
 	public float getShrinkSpeed() {
@@ -70,23 +71,23 @@ public class GameLogic implements IUpdatable {
 
 		if (Math.abs(camPosition - targetPos) > 0.0001) {
 			// Move camera towards target position
+			mGameState.setPausedChangeable(false);
 			float dPosition = Math.signum(targetPos - camPosition) * CAM_SPEED
 					* timeElapsed;
 			if (Math.signum(targetPos - camPosition) != Math.signum(targetPos
 					- camPosition - dPosition)) {
 				camPosition = targetPos;
+				mGameState.setPausedChangeable(true);
 			} else {
 				camPosition += dPosition;
 			}
 			mGameState.setCameraZ(camPosition);
-		}
-
-		mScene.getPlayerModel().isVisible(!mGameState.getPaused());
-		
-		if (!mGameState.getPaused()) {
+		} else if (!mGameState.getPaused()) {
 			totalTime += timeElapsed;
 			mGameState.setTimeElapsed(totalTime);
 		}
+
+		mScene.getPlayerModel().isVisible(!mGameState.getPaused());
 
 		updateAngle(timeElapsed);
 

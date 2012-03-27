@@ -10,6 +10,10 @@ public interface IGameState {
 
 	public abstract boolean getPaused();
 	
+	public abstract void setPausedChangeable(boolean mPauseState);
+
+	public abstract boolean getPausedChangeable();
+	
 	public abstract void setTimeElapsed(long time);
 	
 	public abstract long getTimeElapsed();
