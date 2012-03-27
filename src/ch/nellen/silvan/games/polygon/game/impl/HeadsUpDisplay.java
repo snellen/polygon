@@ -15,6 +15,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 	private TextSprite totalTime;
 
 	IGameState mGameState = null;
+	private int mScreenWidth;
+	private int mScreenHeight;
 
 	public HeadsUpDisplay(IRenderContext rc, IGameState gameState) {
 		super();
@@ -35,7 +37,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(background | 0xff000000);
 		totalTime.setTextSize(32);
-		totalTime.setText("00:00");
+		totalTime.setText("TIME: 00:0");
 		rc.getRenderer().registerRenderable2D(totalTime);
 
 		pausedText = new TextSprite();
@@ -78,9 +80,10 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 
 		String timeString;
 		long time = mGameState.getTimeElapsed();
-		timeString = Long.toString((time / 1000)) + ":"
+		timeString = "TIME: "+Long.toString((time / 1000)) + ":"
 				+ Long.toString((time / 100) % 10);
 		totalTime.setText(timeString);
+		totalTime.setX(mScreenWidth - totalTime.getWidth());
 
 		pausedText.isVisible(mGameState.getPaused());
 		pauseButton.isVisible(!mGameState.getPaused());
@@ -88,11 +91,14 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 	}
 
 	public void onScreenChanged(int screenWidth, int screenHeight) {
-		totalTime.setX(screenWidth - 100);
+		mScreenWidth = screenWidth;
+		mScreenHeight = screenHeight;
+		
+		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setY(20);
 
-		pausedText.setX((screenWidth - pausedText.getWidth()) / 2);
-		pausedText.setY((screenHeight - pausedText.getHeight()) / 2);
+		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
+		pausedText.setY((mScreenHeight - pausedText.getHeight()) / 2);
 	}
 
 }
