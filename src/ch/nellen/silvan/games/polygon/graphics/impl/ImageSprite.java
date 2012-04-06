@@ -12,12 +12,14 @@ public class ImageSprite extends Sprite {
 
 	public ImageSprite(Resources resource, int id) {
 		mBitmap = BitmapFactory.decodeResource(resource, id);
+		mHeight = mBitmap.getHeight();
+		mWidth = mBitmap.getWidth();
 	}
 
 	// Overrides height and width
 	public void scale(float factor) {
-		mHeight = (int) (mBitmap.getHeight() * factor);
-		mWidth = (int) (mBitmap.getWidth() * factor);
+		setHeight((int) (mBitmap.getHeight() * factor));
+		setWidth((int) (mBitmap.getWidth() * factor));
 	}
 
 	public void setHeight(int mHeight) {

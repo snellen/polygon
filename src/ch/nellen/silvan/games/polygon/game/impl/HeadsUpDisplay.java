@@ -32,9 +32,10 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 				(int) (0.76953125f * 255), (int) (0.22265625f * 255));
 		pauseButton = new TextSprite();
 		pauseButton.setBackgroundColor(background);
+		pauseButton.setTextColor(background | 0xff000000);
 		pauseButton.setX(20);
 		pauseButton.setY(20);
-		pauseButton.setTextSize(32);
+		pauseButton.setTextSize(24);
 		pauseButton.setText("PAUSE");
 		pauseButton.setPaddingHorizontal(10);
 		rc.getRenderer().registerRenderable2D(pauseButton);
@@ -42,7 +43,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		totalTime = new TextSprite();
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(background | 0xff000000);
-		totalTime.setTextSize(32);
+		totalTime.setTextSize(24);
 		totalTime.setText("TIME: 00:0");
 		totalTime.setPaddingHorizontal(5);
 		rc.getRenderer().registerRenderable2D(totalTime);
@@ -50,12 +51,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pausedText = new TextSprite();
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
 		pausedText.setTextColor(background | 0xff000000);
-		pausedText.setTextSize(64);
+		pausedText.setTextSize(40);
 		pausedText.setText("PAUSED");
 		rc.getRenderer().registerRenderable2D(pausedText);
 
 		logo = new ImageSprite(resources, R.drawable.logo);
-		logo.scale(0.75f);
+		logo.scale(1.3f);
 		logo.setX(0);
 		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
@@ -95,17 +96,23 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 
 		String timeString;
 		long time = mGameState.getTimeElapsed();
-		timeString = "TIME: " + Long.toString((time / 1000)) + ":"
-				+ Long.toString((time / 100) % 10);
+		timeString = "TIME " + String.format("%02d", (time / 1000)) + ":"
+				+ String.format("%02d", ((time / 100) % 10)*10 );
 		totalTime.setText(timeString);
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 
-		pausedText.isVisible(mGameState.getStarted() && mGameState.getPaused());
+		logo.isVisible(!mGameState.getStarted() || mGameState.getPaused());
+		
+		pausedText.setText(!mGameState.getStarted()?"TAP TO START":"PAUSED");
+		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
+		
+		pausedText.isVisible(!mGameState.getStarted() || mGameState.getPaused());
+		
 		pauseButton
 				.isVisible(mGameState.getStarted()
 						&& (mGameState.getPausedChangeable() && !mGameState
 								.getPaused()));
-		logo.isVisible(!mGameState.getStarted());
+		
 
 	}
 
@@ -116,11 +123,13 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setY(20);
 
-		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
-		pausedText.setY((mScreenHeight - pausedText.getHeight()) / 2);
-
+		float scale = (float) (mScreenWidth*0.8/logo.getWidth());
+		logo.scale(scale);
 		logo.setX((mScreenWidth - logo.getWidth()) / 2);
 		logo.setY((mScreenHeight - logo.getHeight()) / 2);
+		
+		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
+		pausedText.setY(logo.getY()+logo.getHeight()+5);
 	}
 
 }
