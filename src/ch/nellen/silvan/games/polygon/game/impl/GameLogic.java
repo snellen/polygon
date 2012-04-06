@@ -75,17 +75,19 @@ public class GameLogic implements IUpdatable {
 			mGameState.setPausedChangeable(false);
 			float dPosition = Math.signum(targetPos - camPosition) * CAM_SPEED
 					* timeElapsed;
-			if (Math.signum(targetPos - camPosition) != Math.signum(targetPos
-					- camPosition - dPosition)) {
+			if (Math.signum(targetPos - camPosition) != Math.signum(targetPos - camPosition - dPosition) // Overshoot
+					|| Math.abs(targetPos - camPosition - dPosition) < 0.001) { // Close enough
 				camPosition = targetPos;
 				mGameState.setPausedChangeable(true);
 			} else {
 				camPosition += dPosition;
 			}
 			mGameState.setCameraZ(camPosition);
+
 		} else if (!mGameState.getPaused()) {
 			totalTime += timeElapsed;
 			mGameState.setTimeElapsed(totalTime);
+			mGameState.setStarted(true);
 		}
 
 		mScene.getPlayerModel().isVisible(!mGameState.getPaused());

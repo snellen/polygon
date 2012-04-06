@@ -1,11 +1,14 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
+import ch.nellen.silvan.games.R;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
 public class HeadsUpDisplay implements IInputHandler, IUpdatable {
@@ -13,12 +16,14 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
 	private TextSprite totalTime;
+	private ImageSprite logo;
 
 	IGameState mGameState = null;
 	private int mScreenWidth;
 	private int mScreenHeight;
 
-	public HeadsUpDisplay(IRenderContext rc, IGameState gameState) {
+	public HeadsUpDisplay(Resources resources, IRenderContext rc,
+			IGameState gameState) {
 		super();
 
 		mGameState = gameState;
@@ -48,6 +53,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pausedText.setTextSize(64);
 		pausedText.setText("PAUSED");
 		rc.getRenderer().registerRenderable2D(pausedText);
+
+		logo = new ImageSprite(resources, R.drawable.logo);
+		logo.scale(0.75f);
+		logo.setX(0);
+		logo.setY(0);
+		rc.getRenderer().registerRenderable2D(logo);
 	}
 
 	@Override
@@ -89,8 +100,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		totalTime.setText(timeString);
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 
-		pausedText.isVisible(mGameState.getPaused());
-		pauseButton.isVisible(mGameState.getPausedChangeable() && !mGameState.getPaused());
+		pausedText.isVisible(mGameState.getStarted() && mGameState.getPaused());
+		pauseButton
+				.isVisible(mGameState.getStarted()
+						&& (mGameState.getPausedChangeable() && !mGameState
+								.getPaused()));
+		logo.isVisible(!mGameState.getStarted());
 
 	}
 
@@ -103,6 +118,9 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY((mScreenHeight - pausedText.getHeight()) / 2);
+
+		logo.setX((mScreenWidth - logo.getWidth()) / 2);
+		logo.setY((mScreenHeight - logo.getHeight()) / 2);
 	}
 
 }

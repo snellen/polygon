@@ -17,8 +17,6 @@ public abstract class Sprite extends Renderable implements ISprite {
 
 	protected int mX = 0;
 	protected int mY = 0;
-	protected int mWidth = 0;
-	protected int mHeight = 0;
 	
 	// Subclasses may set this flag to indicate that the texture has changed and needs to be reloaded on next render pass
 	protected boolean mRefresh = true; // Force refresh on first render pass

@@ -23,7 +23,7 @@ public class PolygonSurfaceView extends GLSurfaceView {
 	public PolygonSurfaceView(Context context) {
 		super(context);
 
-		mRenderer = new PolygonRenderer();
+		mRenderer = new PolygonRenderer(this.getResources());
 
 		// Set the Renderer for drawing on the GLSurfaceView
 		setRenderer(mRenderer);

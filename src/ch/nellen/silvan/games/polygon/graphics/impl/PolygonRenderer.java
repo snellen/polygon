@@ -5,6 +5,7 @@ import java.util.Vector;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.res.Resources;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.SystemClock;
@@ -36,13 +37,13 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private int mScreenWidth;
 	private int mScreenHeight;
 
-	public PolygonRenderer() {
+	public PolygonRenderer(Resources resources) {
 		super();
 		mRenderContext = new RenderContext(this);
 		mScene = new Scene(mRenderContext);
 		
 		mGameState = new GameState();
-		mHud = new HeadsUpDisplay(mRenderContext, mGameState);
+		mHud = new HeadsUpDisplay(resources, mRenderContext, mGameState);
 		mGameController = new GameController(mGameState);
 		mGameLogic = new GameLogic(mScene, mGameState);
 	}
