@@ -17,6 +17,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 	private TextSprite pausedText;
 	private TextSprite totalTime;
 	private ImageSprite logo;
+	private ImageSprite leftKey;
+	private ImageSprite rightKey;
 
 	IGameState mGameState = null;
 	private int mScreenWidth;
@@ -60,6 +62,16 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		logo.setX(0);
 		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
+		
+		leftKey = new ImageSprite(resources, R.drawable.key_left);
+		leftKey.setX(0);
+		leftKey.setY(0);
+		rc.getRenderer().registerRenderable2D(leftKey);
+		
+		rightKey = new ImageSprite(resources, R.drawable.key_right);
+		rightKey.setX(0);
+		rightKey.setY(0);
+		rc.getRenderer().registerRenderable2D(rightKey);
 	}
 
 	@Override
@@ -97,7 +109,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		String timeString;
 		long time = mGameState.getTimeElapsed();
 		timeString = "TIME " + String.format("%02d", (time / 1000)) + ":"
-				+ String.format("%02d", ((time / 100) % 10)*10 );
+				+ String.format("%02d", (time / 10) % 100 );
 		totalTime.setText(timeString);
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 
@@ -113,7 +125,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 						&& (mGameState.getPausedChangeable() && !mGameState
 								.getPaused()));
 		
-
+		rightKey.isVisible(mGameState.getStarted()
+						&& (mGameState.getPausedChangeable() && !mGameState
+								.getPaused()));
+		leftKey.isVisible(mGameState.getStarted()
+				&& (mGameState.getPausedChangeable() && !mGameState
+						.getPaused()));
 	}
 
 	public void onScreenChanged(int screenWidth, int screenHeight) {
@@ -130,6 +147,18 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY()+logo.getHeight()+5);
+		
+		int distTop = 50, distBorder = 5;
+		
+		leftKey.setX(distBorder);
+		leftKey.setY(distTop);
+		leftKey.setHeight(screenHeight-2*distTop);
+		leftKey.setWidth(screenWidth/6);
+		
+		rightKey.setX(screenWidth-distBorder-screenWidth/6);
+		rightKey.setY(distTop);
+		rightKey.setWidth(screenWidth/6);
+		rightKey.setHeight(screenHeight-2*distTop);
 	}
 
 }
