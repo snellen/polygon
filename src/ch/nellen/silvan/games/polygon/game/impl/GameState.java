@@ -9,6 +9,7 @@ public class GameState implements IGameState {
 	private long mTimeElapsed;
 	private float mTime;
 	private boolean mPausedChangeable;
+	private boolean mStarted;
 
 	public void setPlayerAngularDir(int mAngularDir) {
 		this.mAngularDir = mAngularDir;
@@ -56,6 +57,17 @@ public class GameState implements IGameState {
 	@Override
 	public boolean getPausedChangeable() {
 		return mPausedChangeable;
+	}
+
+	@Override
+	public void setStarted(boolean mPauseState) {
+		mStarted = mPauseState;
+		
+	}
+
+	@Override
+	public boolean getStarted() {
+		return mStarted;
 	}
 
 }

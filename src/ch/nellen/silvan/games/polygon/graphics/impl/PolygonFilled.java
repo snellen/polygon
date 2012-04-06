@@ -7,7 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
-public class PolygonFilled extends AbstractPolygonModel {
+public class PolygonFilled extends PolygonModel {
 
 	RGBAColor mColor;
 

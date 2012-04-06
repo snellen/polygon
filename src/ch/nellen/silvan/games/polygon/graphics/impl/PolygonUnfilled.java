@@ -7,7 +7,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
-public class PolygonUnfilled extends AbstractPolygonModel {
+public class PolygonUnfilled extends PolygonModel {
 	// Properties
 	private boolean[] mEdgeEnabled;
 	private int numEdgesEnabled = NUMBER_OF_VERTICES;

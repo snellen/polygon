@@ -1,6 +1,6 @@
 package ch.nellen.silvan.games.polygon.graphics;
 
-public interface ITextSprite extends IRenderable {
+public interface ITextSprite extends IRenderable, ISprite {
 	void setText(String text);
 
 	String getText();
@@ -28,17 +28,4 @@ public interface ITextSprite extends IRenderable {
 	void setBackgroundColor(int color);
 
 	int getBackgroundColor();
-
-	// Pixels
-	void setX(int x);
-
-	// Pixels
-	int getX();
-
-	// Pixels
-	void setY(int x);
-
-	// Pixels
-	int getY();
-
 }

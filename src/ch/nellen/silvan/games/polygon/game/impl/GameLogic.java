@@ -32,6 +32,7 @@ public class GameLogic implements IUpdatable {
 		mGameState = gameState;
 		mScene = scene;
 
+		mGameState.setStarted(false);
 		mGameState.setPaused(true);
 		mGameState.setCameraZ(PAUSE_CAM_POSITION);
 		mGameState.setPausedChangeable(true);
