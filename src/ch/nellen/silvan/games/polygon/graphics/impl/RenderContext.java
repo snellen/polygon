@@ -15,13 +15,11 @@ public class RenderContext implements IRenderContext {
 	// Preallocated rendering buffer
 	// At any time only one instance of IRenderable is rendering,
 	// the buffers can be shared for performance and memory consumption reasons.
-	private float[] mVertexBuffer = null;
-	private short[] mIndicesBuffer = null;
 	private GL10 mGl = null;
 	private IRenderer mRenderer;
 	
-	private FloatBuffer vBuffer;
-	private ShortBuffer iBuffer;
+	private FloatBuffer vBuffer = null;
+	private ShortBuffer iBuffer = null;
 
 	public RenderContext(IRenderer renderer) {
 		super();
@@ -31,8 +29,8 @@ public class RenderContext implements IRenderContext {
 	@Override
 	public void registerVertexBuffer(int size) {
 		/* Initialize vertex buffer */
-		if (mVertexBuffer == null || mVertexBuffer.length < size) {
-			mVertexBuffer = new float[size];
+		if (vBuffer == null || vBuffer.limit() < size) {
+			float[] mVertexBuffer = new float[size];
 			// (# of coordinate values * 4 bytes per float)
 			ByteBuffer vbb = ByteBuffer.allocateDirect(mVertexBuffer.length * 4);
 
@@ -47,8 +45,8 @@ public class RenderContext implements IRenderContext {
 	@Override
 	public void registerIndicesBuffer(int size) {
 		/* Initialize indices buffer */
-		if (mIndicesBuffer == null || mIndicesBuffer.length < size) {
-			mIndicesBuffer = new short[size];
+		if (iBuffer == null || iBuffer.limit() < size) {
+			short[] mIndicesBuffer = new short[size];
 			ByteBuffer idb = ByteBuffer.allocateDirect(mIndicesBuffer.length * 2);
 			idb.order(ByteOrder.nativeOrder());
 			iBuffer = idb.asShortBuffer();
