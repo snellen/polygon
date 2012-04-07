@@ -22,19 +22,21 @@ public class Scene implements IScene {
 		super();
 
 		mCenterPolygon = new PolygonFilled(rc);
-		mCenterPolygon.setZCoord(0.1f);
+		mCenterPolygon.setZCoord(0.011f);
+		mCenterPolygon.setColor(new RGBAColor(0f, 0f, 0f, 1.0f));
 		mCenterPolygonBorder = new PolygonFilled(rc);
-		mCenterPolygonBorder.setZCoord(0.05f);
+		mCenterPolygonBorder.setZCoord(0.011f);
 		mCenterPolygonBorder.setColor(new RGBAColor(0.93671875f, 0.76953125f,
 				0.22265625f, 1.0f));
 
 		mPlayerModel = new PlayerModel(rc);
 		mPlayerModel.setAngle(90);
-		mPlayerModel.setZCoord(0.1f);
+		mPlayerModel.setZCoord(0.011f);
 
 		mPolygonModels = new PolygonUnfilled[MAXMODELS];
 		for (int i = 0; i < mPolygonModels.length; ++i) {
 			mPolygonModels[i] = new PolygonUnfilled(rc);
+			mPolygonModels[i].setZCoord(0.0f);
 			mPolygonModels[i].isVisible(false);
 		}
 	}

@@ -5,36 +5,41 @@ import java.util.Observable;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 
 public class GameState extends Observable implements IGameState {
-
-	enum ATTRIBUTE {
-		STARTED, PAUSED
-	}
-
+	
 	private int mAngularDir = 0;
-	private boolean mPauseState = false;
 	private long mTimeElapsed;
 	private float mCameraZ;
-	private boolean mPausedChangeable;
-	private boolean mStarted;
+	private boolean mAcceptInput;
+	private Phase mCurrentPhase = Phase.START;
+	
+	@Override
+	public Phase getCurrentPhase() {
+		return mCurrentPhase;
+	}
+
+	@Override
+	public void setCurrentPhase(Phase newPhase) {
+		if (mCurrentPhase != newPhase) {
+			PhaseChange stateChange = new PhaseChange();
+			stateChange.oldPhase = mCurrentPhase;
+			stateChange.newPhase = newPhase;
+			
+			mCurrentPhase = newPhase;
+			
+			setChanged();
+			notifyObservers(stateChange);
+		}
+	}
 
 	public void setPlayerAngularDir(int mAngularDir) {
 		this.mAngularDir = mAngularDir;
-	}
-
-	public void setPaused(boolean mPauseState) {
-		this.mPauseState = mPauseState;
 	}
 
 	@Override
 	public int getPlayerAngluarDir() {
 		return mAngularDir;
 	}
-
-	@Override
-	public boolean getPaused() {
-		return mPauseState;
-	}
-
+	
 	@Override
 	public void setTimeElapsed(long time) {
 		mTimeElapsed = time;
@@ -56,27 +61,13 @@ public class GameState extends Observable implements IGameState {
 	}
 
 	@Override
-	public void setPausedChangeable(boolean mPauseState) {
-		mPausedChangeable = mPauseState;
+	public void setAcceptInput(boolean flag) {
+		mAcceptInput = flag;
 	}
 
 	@Override
-	public boolean getPausedChangeable() {
-		return mPausedChangeable;
-	}
-
-	@Override
-	public void setStarted(boolean flag) {
-		if (mStarted != flag) {
-			mStarted = flag;
-			setChanged();
-			notifyObservers(ATTRIBUTE.STARTED);
-		}
-	}
-
-	@Override
-	public boolean getStarted() {
-		return mStarted;
+	public boolean getAcceptInput() {
+		return mAcceptInput;
 	}
 
 }

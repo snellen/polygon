@@ -1,5 +1,8 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import ch.nellen.silvan.games.R;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -11,7 +14,7 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
-public class HeadsUpDisplay implements IInputHandler, IUpdatable {
+public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
@@ -20,15 +23,16 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 	private ImageSprite leftKey;
 	private ImageSprite rightKey;
 
-	IGameState mGameState = null;
+	GameState mGameState = null;
 	private int mScreenWidth;
 	private int mScreenHeight;
 
 	public HeadsUpDisplay(Resources resources, IRenderContext rc,
-			IGameState gameState) {
+			GameState gameState) {
 		super();
 
 		mGameState = gameState;
+		mGameState.addObserver(this);
 
 		int background = Color.argb(128, (int) (0.93671875f * 255),
 				(int) (0.76953125f * 255), (int) (0.22265625f * 255));
@@ -41,6 +45,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pauseButton.setText("PAUSE");
 		pauseButton.setPaddingHorizontal(10);
 		pauseButton.setPaddingVertical(20);
+		pauseButton.isVisible(false);
 		rc.getRenderer().registerRenderable2D(pauseButton);
 
 		totalTime = new TextSprite();
@@ -55,7 +60,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
 		pausedText.setTextColor(background | 0xff000000);
 		pausedText.setTextSize(40);
-		pausedText.setText("PAUSED");
+		pausedText.setText("TAP TO START");
 		rc.getRenderer().registerRenderable2D(pausedText);
 
 		logo = new ImageSprite(resources, R.drawable.logo);
@@ -63,15 +68,17 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		logo.setX(0);
 		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
-		
+
 		leftKey = new ImageSprite(resources, R.drawable.key_left);
 		leftKey.setX(0);
 		leftKey.setY(0);
+		leftKey.isVisible(false);
 		rc.getRenderer().registerRenderable2D(leftKey);
-		
+
 		rightKey = new ImageSprite(resources, R.drawable.key_right);
 		rightKey.setX(0);
 		rightKey.setY(0);
+		rightKey.isVisible(false);
 		rc.getRenderer().registerRenderable2D(rightKey);
 	}
 
@@ -82,7 +89,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		float evX = event.getX();
 		float evY = event.getY();
 
-		if (mGameState.getPausedChangeable()) {
+		if (mGameState.getAcceptInput()) {
 			if (pauseButton.isVisible() && evX > pauseButton.getX()
 					&& evX < pauseButton.getX() + pauseButton.getWidth()
 					&& evY > pauseButton.getY()
@@ -90,13 +97,21 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 				// Touch on pause button
 				if (event.getAction() == MotionEvent.ACTION_UP) {
 					// Pause button released
-					mGameState.setPaused(true);
+					mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
 				}
 				return true; // Event handled
 			}
 
-			if (mGameState.getPaused()) {
-				mGameState.setPaused(false);
+			if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
+					|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
+				if (event.getAction() == MotionEvent.ACTION_UP)
+					mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
+				return true;
+			}
+
+			if (mGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
+				if (event.getAction() == MotionEvent.ACTION_UP)
+					mGameState.setCurrentPhase(IGameState.Phase.START);
 				return true;
 			}
 		}
@@ -106,32 +121,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 
 	@Override
 	public void update(long timeElapsed) {
-
 		String timeString;
 		long time = mGameState.getTimeElapsed();
 		timeString = "TIME " + String.format("%02d", (time / 1000)) + ":"
-				+ String.format("%02d", (time / 10) % 100 );
+				+ String.format("%02d", (time / 10) % 100);
 		totalTime.setText(timeString);
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
-
-		logo.isVisible(!mGameState.getStarted() || mGameState.getPaused());
-		
-		pausedText.setText(!mGameState.getStarted()?"TAP TO START":"PAUSED");
-		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
-		
-		pausedText.isVisible(!mGameState.getStarted() || mGameState.getPaused());
-		
-		pauseButton
-				.isVisible(mGameState.getStarted()
-						&& (mGameState.getPausedChangeable() && !mGameState
-								.getPaused()));
-		
-		rightKey.isVisible(mGameState.getStarted()
-						&& (mGameState.getPausedChangeable() && !mGameState
-								.getPaused()));
-		leftKey.isVisible(mGameState.getStarted()
-				&& (mGameState.getPausedChangeable() && !mGameState
-						.getPaused()));
 	}
 
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
@@ -141,25 +136,67 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setY(10);
 
-		float scale = (float) (mScreenWidth*0.8/logo.getWidth());
+		float scale = (float) (mScreenWidth * 0.8 / logo.getWidth());
 		logo.scale(scale);
 		logo.setX((mScreenWidth - logo.getWidth()) / 2);
 		logo.setY((mScreenHeight - logo.getHeight()) / 2);
-		
+
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
-		pausedText.setY(logo.getY()+logo.getHeight()+5);
-		
+		pausedText.setY(logo.getY() + logo.getHeight() + 5);
+
 		int distTop = 90, distBorder = 5;
-		
+
 		leftKey.setX(distBorder);
 		leftKey.setY(distTop);
-		leftKey.setHeight(screenHeight-2*distTop);
-		leftKey.setWidth(screenWidth/6);
-		
-		rightKey.setX(screenWidth-distBorder-screenWidth/6);
+		leftKey.setHeight(screenHeight - 2 * distTop);
+		leftKey.setWidth(screenWidth / 6);
+
+		rightKey.setX(screenWidth - distBorder - screenWidth / 6);
 		rightKey.setY(distTop);
-		rightKey.setWidth(screenWidth/6);
-		rightKey.setHeight(screenHeight-2*distTop);
+		rightKey.setWidth(screenWidth / 6);
+		rightKey.setHeight(screenHeight - 2 * distTop);
+	}
+
+	@Override
+	public void update(Observable observable, Object data) {
+		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) data;
+		switch (phaseUpdate.newPhase) {
+		case START:
+			logo.isVisible(true);
+			pausedText.isVisible(true);
+			pausedText.setText("TAP TO START");
+			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
+			pauseButton.isVisible(false);
+			rightKey.isVisible(false);
+			leftKey.isVisible(false);
+			break;
+		case RUNNING:
+			logo.isVisible(false);
+			pausedText.isVisible(false);
+			pauseButton.isVisible(true);
+			rightKey.isVisible(true);
+			leftKey.isVisible(true);
+			break;
+		case PAUSED:
+			logo.isVisible(true);
+			pausedText.isVisible(true);
+			pausedText.setText("PAUSED, TAP TO CONTINUE");
+			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
+			pauseButton.isVisible(false);
+			rightKey.isVisible(false);
+			leftKey.isVisible(false);
+			break;
+		case GAMEOVER:
+			logo.isVisible(true);
+			pausedText.isVisible(true);
+			pausedText.setText("GAME OVER, TAP TO RETRY");
+			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
+			pauseButton.isVisible(false);
+			rightKey.isVisible(false);
+			leftKey.isVisible(false);
+			break;
+		}
+
 	}
 
 }

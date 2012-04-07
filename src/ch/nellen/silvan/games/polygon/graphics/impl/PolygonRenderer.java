@@ -34,7 +34,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private GameState mGameState = null;
 	private int mScreenWidth;
 	private int mScreenHeight;
-	private static final float Z_NEAR = 3;
+	private static final float Z_NEAR = 2;
 
 	public PolygonRenderer(Resources resources) {
 		super();
