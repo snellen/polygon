@@ -13,7 +13,7 @@ public class PolygonSurfaceView extends GLSurfaceView {
 	public boolean onTouchEvent(final MotionEvent event) {
 		queueEvent(new Runnable() {
 			public void run() {
-				mRenderer.handleTouchEvent(getWidth(), getHeight(), event);
+				mRenderer.mGame.handleTouchEvent(getWidth(), getHeight(), event);
 			}
 		});
 		return true;
@@ -23,8 +23,9 @@ public class PolygonSurfaceView extends GLSurfaceView {
 	public PolygonSurfaceView(Context context) {
 		super(context);
 
-		mRenderer = new PolygonRenderer(this.getResources());
-
+		mRenderer = new PolygonRenderer();
+		mRenderer.init(context);
+		
 		// Set the Renderer for drawing on the GLSurfaceView
 		setRenderer(mRenderer);
 

@@ -52,7 +52,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(background | 0xff000000);
 		totalTime.setTextSize(24);
-		totalTime.setText("TIME: 00:0");
+		totalTime.setText("HIGHSCORE " + formatTime(mGameState.getHighscore()));
+		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setPaddingHorizontal(5);
 		rc.getRenderer().registerRenderable2D(totalTime);
 
@@ -121,12 +122,18 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 	@Override
 	public void update(long timeElapsed) {
-		String timeString;
-		long time = mGameState.getTimeElapsed();
-		timeString = "TIME " + String.format("%02d", (time / 1000)) + ":"
+		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
+			String timeString;
+			long time = mGameState.getTimeElapsed();
+			timeString = "TIME " + formatTime(time);
+			totalTime.setText(timeString);
+			totalTime.setX(mScreenWidth - totalTime.getWidth());
+		}
+	}
+
+	String formatTime(long time) {
+		return String.format("%02d", (time / 1000)) + ":"
 				+ String.format("%02d", (time / 10) % 100);
-		totalTime.setText(timeString);
-		totalTime.setX(mScreenWidth - totalTime.getWidth());
 	}
 
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
@@ -159,6 +166,10 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 	@Override
 	public void update(Observable observable, Object data) {
+
+		if (data == null)
+			return;
+
 		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) data;
 		switch (phaseUpdate.newPhase) {
 		case START:
@@ -169,6 +180,9 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pauseButton.isVisible(false);
 			rightKey.isVisible(false);
 			leftKey.isVisible(false);
+			totalTime.setText("HIGHSCORE "
+					+ formatTime(mGameState.getHighscore()));
+			totalTime.setX(mScreenWidth - totalTime.getWidth());
 			break;
 		case RUNNING:
 			logo.isVisible(false);

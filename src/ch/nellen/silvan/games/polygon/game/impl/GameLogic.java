@@ -42,7 +42,6 @@ public class GameLogic implements IUpdatable, Observer {
 	private float rotationSpeed = 0.04f;
 	private float playerSpeed = 0.15f;
 	private float shrinkSpeed = 0.8f / 1000;
-	private long totalTime = 0;
 
 	private ICollisionDetection collDec = null;
 	private IScene mScene = null;
@@ -115,7 +114,8 @@ public class GameLogic implements IUpdatable, Observer {
 	public void update(long timeElapsed) {
 
 		boolean cameraMoving = moveCamera(timeElapsed);
-
+		long totalTime = mGameState.getTimeElapsed();
+		
 		if (!cameraMoving
 				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			totalTime += timeElapsed;
@@ -159,6 +159,7 @@ public class GameLogic implements IUpdatable, Observer {
 			if (collDec.isPlayerCollided(mScene)) {
 				playerModel.setColor(new RGBAColor(0f, 0f, 1f, 1.0f));
 				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
+				mGameState.setHighscore(totalTime);
 			} else {
 				playerModel.setColor(new RGBAColor(1f, 0f, 0f, 1.0f));
 			}
@@ -181,6 +182,10 @@ public class GameLogic implements IUpdatable, Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
+		
+		if (arg1 == null)
+			return;
+		
 		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) arg1;
 		if (phaseUpdate.newPhase == GameState.Phase.RUNNING) {
 			mScene.getPlayerModel().isVisible(true);
@@ -205,8 +210,6 @@ public class GameLogic implements IUpdatable, Observer {
 				mGameState.setTimeElapsed(0);
 			}
 		}
-		
-		
 	}
 
 }

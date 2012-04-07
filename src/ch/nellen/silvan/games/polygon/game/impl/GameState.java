@@ -4,14 +4,19 @@ import java.util.Observable;
 
 import ch.nellen.silvan.games.polygon.game.IGameState;
 
+/*
+ * Holds the important information about the game,
+ * notifies listeners when the game phase changes or a new highscore is reached
+ * */
 public class GameState extends Observable implements IGameState {
-	
+
 	private int mAngularDir = 0;
 	private long mTimeElapsed;
+	private long mHighscore = 0;
 	private float mCameraZ;
 	private boolean mAcceptInput;
 	private Phase mCurrentPhase = Phase.START;
-	
+
 	@Override
 	public Phase getCurrentPhase() {
 		return mCurrentPhase;
@@ -23,9 +28,9 @@ public class GameState extends Observable implements IGameState {
 			PhaseChange stateChange = new PhaseChange();
 			stateChange.oldPhase = mCurrentPhase;
 			stateChange.newPhase = newPhase;
-			
+
 			mCurrentPhase = newPhase;
-			
+
 			setChanged();
 			notifyObservers(stateChange);
 		}
@@ -39,7 +44,7 @@ public class GameState extends Observable implements IGameState {
 	public int getPlayerAngluarDir() {
 		return mAngularDir;
 	}
-	
+
 	@Override
 	public void setTimeElapsed(long time) {
 		mTimeElapsed = time;
@@ -68,6 +73,18 @@ public class GameState extends Observable implements IGameState {
 	@Override
 	public boolean getAcceptInput() {
 		return mAcceptInput;
+	}
+
+	public long getHighscore() {
+		return mHighscore;
+	}
+
+	public void setHighscore(long highscore) {
+		if (mHighscore < highscore) {
+			mHighscore = highscore;
+			setChanged();
+			notifyObservers(null);
+		}
 	}
 
 }
