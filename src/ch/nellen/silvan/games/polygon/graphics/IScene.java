@@ -14,4 +14,6 @@ public interface IScene {
 	public PolygonFilled getCenterPolygonBorder();
 
 	public float getCenterRadius();
+
+	public void onMaxVisibleRadiusChanged(float mMaxVisibleRadius);
 }

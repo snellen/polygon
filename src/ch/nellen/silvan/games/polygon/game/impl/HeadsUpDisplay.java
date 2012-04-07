@@ -36,10 +36,11 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pauseButton.setBackgroundColor(background);
 		pauseButton.setTextColor(background | 0xff000000);
 		pauseButton.setX(20);
-		pauseButton.setY(20);
+		pauseButton.setY(10);
 		pauseButton.setTextSize(24);
 		pauseButton.setText("PAUSE");
 		pauseButton.setPaddingHorizontal(10);
+		pauseButton.setPaddingVertical(20);
 		rc.getRenderer().registerRenderable2D(pauseButton);
 
 		totalTime = new TextSprite();
@@ -133,12 +134,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 						.getPaused()));
 	}
 
-	public void onScreenChanged(int screenWidth, int screenHeight) {
+	public void onSurfaceChanged(int screenWidth, int screenHeight) {
 		mScreenWidth = screenWidth;
 		mScreenHeight = screenHeight;
 
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
-		totalTime.setY(20);
+		totalTime.setY(10);
 
 		float scale = (float) (mScreenWidth*0.8/logo.getWidth());
 		logo.scale(scale);
@@ -148,7 +149,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable {
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY()+logo.getHeight()+5);
 		
-		int distTop = 50, distBorder = 5;
+		int distTop = 90, distBorder = 5;
 		
 		leftKey.setX(distBorder);
 		leftKey.setY(distTop);

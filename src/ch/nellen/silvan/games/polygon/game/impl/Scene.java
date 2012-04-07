@@ -1,6 +1,5 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
-import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.IScene;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
@@ -15,36 +14,28 @@ public class Scene implements IScene {
 	private PolygonFilled mCenterPolygonBorder = null;
 	private PlayerModel mPlayerModel = null;
 
-	// Static Scene Parameters
 	private int MAXMODELS = 8;
-	private float CENTER_RADIUS = 0.3f;
-	private float CENTER_WIDTH = 0.05f;
+	private float CENTER_RADIUS;
+	private float CENTER_WIDTH;
 
 	public Scene(IRenderContext rc) {
 		super();
 
 		mCenterPolygon = new PolygonFilled(rc);
-		mCenterPolygon.setRadius(CENTER_RADIUS);
 		mCenterPolygon.setZCoord(0.1f);
 		mCenterPolygonBorder = new PolygonFilled(rc);
-		mCenterPolygonBorder.setRadius(CENTER_RADIUS + CENTER_WIDTH);
 		mCenterPolygonBorder.setZCoord(0.05f);
 		mCenterPolygonBorder.setColor(new RGBAColor(0.93671875f, 0.76953125f,
 				0.22265625f, 1.0f));
 
 		mPlayerModel = new PlayerModel(rc);
-		mPlayerModel.setRadius(CENTER_RADIUS + CENTER_WIDTH + 0.1f);
 		mPlayerModel.setAngle(90);
 		mPlayerModel.setZCoord(0.1f);
 
 		mPolygonModels = new PolygonUnfilled[MAXMODELS];
-		boolean[] edgeEnabled = new boolean[IPolygonModel.NUMBER_OF_VERTICES];
 		for (int i = 0; i < mPolygonModels.length; ++i) {
 			mPolygonModels[i] = new PolygonUnfilled(rc);
-			mPolygonModels[i].setRadius(i * 4 / 8f);
-			for (int j = 0; j < edgeEnabled.length; ++j)
-				edgeEnabled[j] = (Math.random() < 0.5);
-			mPolygonModels[i].setEdgesActive(edgeEnabled);
+			mPolygonModels[i].isVisible(false);
 		}
 	}
 
@@ -66,5 +57,16 @@ public class Scene implements IScene {
 
 	public PlayerModel getPlayerModel() {
 		return mPlayerModel;
+	}
+
+	@Override
+	public void onMaxVisibleRadiusChanged(float mMaxVisibleRadius) {
+		CENTER_RADIUS = mMaxVisibleRadius * 0.09f;
+		CENTER_WIDTH = mMaxVisibleRadius * 0.01f;
+
+		mPlayerModel
+				.setRadius((float) (CENTER_RADIUS + CENTER_WIDTH + mMaxVisibleRadius * 0.01));
+		mCenterPolygonBorder.setRadius(CENTER_RADIUS + CENTER_WIDTH);
+		mCenterPolygon.setRadius(CENTER_RADIUS);
 	}
 }

@@ -1,13 +1,19 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
+import java.util.Observable;
+
 import ch.nellen.silvan.games.polygon.game.IGameState;
 
-public class GameState implements IGameState {
+public class GameState extends Observable implements IGameState {
+
+	enum ATTRIBUTE {
+		STARTED, PAUSED
+	}
 
 	private int mAngularDir = 0;
 	private boolean mPauseState = false;
 	private long mTimeElapsed;
-	private float mTime;
+	private float mCameraZ;
 	private boolean mPausedChangeable;
 	private boolean mStarted;
 
@@ -40,18 +46,18 @@ public class GameState implements IGameState {
 	}
 
 	@Override
-	public void setCameraZ(float time) {
-		mTime = time;
+	public void setCameraZ(float z) {
+		mCameraZ = z;
 	}
 
 	@Override
 	public float getCameraZ() {
-		return mTime;
+		return mCameraZ;
 	}
 
 	@Override
 	public void setPausedChangeable(boolean mPauseState) {
-		mPausedChangeable = mPauseState;	
+		mPausedChangeable = mPauseState;
 	}
 
 	@Override
@@ -60,9 +66,12 @@ public class GameState implements IGameState {
 	}
 
 	@Override
-	public void setStarted(boolean mPauseState) {
-		mStarted = mPauseState;
-		
+	public void setStarted(boolean flag) {
+		if (mStarted != flag) {
+			mStarted = flag;
+			setChanged();
+			notifyObservers(ATTRIBUTE.STARTED);
+		}
 	}
 
 	@Override

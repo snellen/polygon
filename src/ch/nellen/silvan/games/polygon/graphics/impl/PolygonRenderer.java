@@ -10,13 +10,11 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.SystemClock;
 import android.view.MotionEvent;
-import ch.nellen.silvan.games.polygon.game.IUpdatable;
-import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
+import ch.nellen.silvan.games.polygon.game.impl.GameController;
 import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
 import ch.nellen.silvan.games.polygon.game.impl.GameState;
 import ch.nellen.silvan.games.polygon.game.impl.HeadsUpDisplay;
-import ch.nellen.silvan.games.polygon.game.impl.GameController;
 import ch.nellen.silvan.games.polygon.game.impl.Scene;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
@@ -28,14 +26,15 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private IRenderContext mRenderContext = null;
 	private Vector<IRenderable> mRenderables3D = new Vector<IRenderable>(16);
 	private Vector<IRenderable> mRenderables2D = new Vector<IRenderable>(16);
-	private IUpdatable mGameLogic = null;
+	private GameLogic mGameLogic = null;
 	long lastUpdate = 0;
 	private IScene mScene = null;
 	private IInputHandler mGameController = null;
 	private HeadsUpDisplay mHud = null;
-	private IGameState mGameState = null;
+	private GameState mGameState = null;
 	private int mScreenWidth;
 	private int mScreenHeight;
+	private static final float Z_NEAR = 3;
 
 	public PolygonRenderer(Resources resources) {
 		super();
@@ -129,16 +128,17 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		mScreenWidth = width;
 		mScreenHeight = height;
+		float ratio = (float) width / height;
 		
-		mHud.onScreenChanged(mScreenWidth, mScreenHeight);
+		mHud.onSurfaceChanged(mScreenWidth, mScreenHeight);
+		mGameLogic.onSurfaceChanged(mScreenWidth, mScreenHeight, (float) (Math.sqrt(ratio*ratio+1)/Z_NEAR));
 		
 		gl.glViewport(0, 0, width, height);
 
 		// make adjustments for screen ratio
-		float ratio = (float) width / height;
 		gl.glMatrixMode(GL10.GL_PROJECTION); // set matrix to projection mode
 		gl.glLoadIdentity(); // reset the matrix to its default state
-		gl.glFrustumf(-ratio, ratio, -1, 1, 3, 7); // apply the projection
+		gl.glFrustumf(-ratio, ratio, -1, 1, Z_NEAR , 7); // apply the projection
 													// matrix
 	}
 

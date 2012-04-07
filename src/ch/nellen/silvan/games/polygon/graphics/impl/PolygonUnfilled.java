@@ -9,18 +9,13 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
 public class PolygonUnfilled extends PolygonModel {
 	// Properties
-	private boolean[] mEdgeEnabled;
+	private boolean[] mEdgeEnabled = new boolean[NUMBER_OF_VERTICES];
 	private int numEdgesEnabled = NUMBER_OF_VERTICES;
-	private float mWidth = 0.25f;
+	private float mWidth = 0.5f;
 
 	public PolygonUnfilled(IRenderContext rc) {
 		super();
 		rc.getRenderer().registerRenderable3D(this);
-		/* Init number of edges enabled */
-		boolean[] edgeEnabled = new boolean[NUMBER_OF_VERTICES];
-		for (int i = 0; i < NUMBER_OF_VERTICES; ++i)
-			edgeEnabled[i] = true;
-		this.setEdgesActive(edgeEnabled);
 	}
 
 	public void setWidth(float w) {
@@ -31,12 +26,6 @@ public class PolygonUnfilled extends PolygonModel {
 		return mWidth;
 	}
 
-	public void setEdgesActive(boolean[] flags) {
-		assert (flags.length == NUMBER_OF_VERTICES);
-		mEdgeEnabled = flags.clone();
-		updateNumberOfEdgesEnabled();
-	}
-	
 	public final boolean[] getEdgesEnabled() {
 		return mEdgeEnabled;
 	}
@@ -68,6 +57,7 @@ public class PolygonUnfilled extends PolygonModel {
 		float outerRadius = mRadius + mWidth;
 		int j = 0;
 		int iBase = 0;
+		numEdgesEnabled = 0;
 		for (int i = 0; i < NUMBER_OF_VERTICES; ++i) {
 			iBase = i * 6;
 			vertexBuffer[iBase] = polygonPrototype[i][0] * mRadius; // Xi.1
@@ -90,15 +80,8 @@ public class PolygonUnfilled extends PolygonModel {
 				indicesBuffer[jBase + 4] = (short) ((short) (indBase + 2) % (MAXCORNERSIND));
 				indicesBuffer[jBase + 5] = (short) ((short) (indBase + 3) % (MAXCORNERSIND));
 				j++;
-			}
-		}
-	}
-
-	private void updateNumberOfEdgesEnabled() {
-		numEdgesEnabled = 0;
-		for (int i = 0; i < mEdgeEnabled.length; ++i) {
-			if (mEdgeEnabled[i])
 				numEdgesEnabled++;
+			}
 		}
 	}
 
