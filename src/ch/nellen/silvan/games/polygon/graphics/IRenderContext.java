@@ -17,10 +17,6 @@ public interface IRenderContext {
 
 	public void registerIndicesBuffer(int size);
 
-	public float[] getVertexBuffer();
-
-	public short[] getIndicesBuffer();
-
 	public FloatBuffer getGlVertexBuffer();
 
 	public ShortBuffer getGlIndicesBuffer();

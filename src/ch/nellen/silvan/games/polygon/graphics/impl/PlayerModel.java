@@ -33,11 +33,12 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 
 	@Override
 	public void render(IRenderContext rc) {
-		recalculateGeometry(rc.getVertexBuffer(), rc.getIndicesBuffer());
-		
-		GL10 gl = rc.getGl();
 		FloatBuffer vBuffer = rc.getGlVertexBuffer();
 		ShortBuffer iBuffer = rc.getGlIndicesBuffer();
+		
+		recalculateGeometry(vBuffer, iBuffer);
+		
+		GL10 gl = rc.getGl();
 		
 		// Draw the polygon
 		gl.glColor4f(mColor.r, mColor.g, mColor.b, mColor.alpha);
@@ -49,17 +50,17 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 		gl.glDrawElements(GL10.GL_TRIANGLES, 3, GL10.GL_UNSIGNED_SHORT, iBuffer);
 	}
 
-	private void recalculateGeometry(float[] vertexBuffer, short[] indicesBuffer) {
+	private void recalculateGeometry(FloatBuffer vertexBuffer, ShortBuffer indicesBuffer) {
 		int iBase = 0;
 		for (int i = 0; i < 3; ++i) {
 			iBase = i * 3;
-			vertexBuffer[iBase] = triangleCoords[iBase]; // Xi.1
-			vertexBuffer[iBase + 1] = triangleCoords[iBase+1]; // Yi.1
-			vertexBuffer[iBase + 2] = mZCoord; // Zi.1
+			vertexBuffer.put(iBase, triangleCoords[iBase]); // Xi.1
+			vertexBuffer.put(iBase + 1, triangleCoords[iBase+1]); // Yi.1
+			vertexBuffer.put(iBase + 2, mZCoord); // Zi.1
 		}
-		indicesBuffer[0] = 0;
-		indicesBuffer[1] = 1;
-		indicesBuffer[2] = 2;
+		indicesBuffer.put(0, (short) 0);
+		indicesBuffer.put(1, (short) 1);
+		indicesBuffer.put(2, (short) 2);
 	}
 	
 	@Override

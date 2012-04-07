@@ -36,11 +36,12 @@ public class PolygonUnfilled extends PolygonModel {
 	}
 
 	public void render(IRenderContext rc) {
-		recalculateGeometry(rc.getVertexBuffer(), rc.getIndicesBuffer());
-
-		GL10 gl = rc.getGl();
 		FloatBuffer vBuffer = rc.getGlVertexBuffer();
 		ShortBuffer iBuffer = rc.getGlIndicesBuffer();
+		
+		recalculateGeometry(vBuffer, iBuffer);
+
+		GL10 gl = rc.getGl();
 
 		// Draw the polygon
 		gl.glColor4f(0.93671875f, 0.76953125f, 0.22265625f, 0.0f); // TODO:
@@ -53,32 +54,32 @@ public class PolygonUnfilled extends PolygonModel {
 				GL10.GL_UNSIGNED_SHORT, iBuffer);
 	}
 
-	private void recalculateGeometry(float[] vertexBuffer, short[] indicesBuffer) {
+	private void recalculateGeometry(FloatBuffer vertexBuffer, ShortBuffer indicesBuffer) {
 		float outerRadius = mRadius + mWidth;
 		int j = 0;
 		int iBase = 0;
 		numEdgesEnabled = 0;
 		for (int i = 0; i < NUMBER_OF_VERTICES; ++i) {
 			iBase = i * 6;
-			vertexBuffer[iBase] = polygonPrototype[i][0] * mRadius; // Xi.1
-			vertexBuffer[iBase + 1] = polygonPrototype[i][1] * mRadius; // Yi.1
-			vertexBuffer[iBase + 2] = mZCoord; // Zi.1
-			vertexBuffer[iBase + 3] = polygonPrototype[i][0] * outerRadius; // Xi.2
-			vertexBuffer[iBase + 4] = polygonPrototype[i][1] * outerRadius; // Yi.2
-			vertexBuffer[iBase + 5] = mZCoord; // Zi.2
+			vertexBuffer.put(iBase, polygonPrototype[i][0] * mRadius); // Xi.1
+			vertexBuffer.put(iBase + 1, polygonPrototype[i][1] * mRadius); // Yi.1
+			vertexBuffer.put(iBase + 2, mZCoord); // Zi.1
+			vertexBuffer.put(iBase + 3, polygonPrototype[i][0] * outerRadius); // Xi.2
+			vertexBuffer.put(iBase + 4, polygonPrototype[i][1] * outerRadius); // Yi.2
+			vertexBuffer.put(iBase + 5, mZCoord); // Zi.2
 
 			if (mEdgeEnabled[i]) {
 				final int jBase = j * 6;
 				final int indBase = i * 2;
 				final int MAXCORNERSIND = NUMBER_OF_VERTICES * 2;
 				// Triangle 1
-				indicesBuffer[jBase] = (short) ((short) (indBase) % (MAXCORNERSIND));
-				indicesBuffer[jBase + 1] = (short) ((short) (indBase + 1) % (MAXCORNERSIND));
-				indicesBuffer[jBase + 2] = (short) ((short) (indBase + 2) % (MAXCORNERSIND));
+				indicesBuffer.put(jBase,(short) ((short) (indBase) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 1, (short) ((short) (indBase + 1) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 2, (short) ((short) (indBase + 2) % (MAXCORNERSIND)));
 				// Triangle 2
-				indicesBuffer[jBase + 3] = (short) ((short) (indBase + 1) % (MAXCORNERSIND));
-				indicesBuffer[jBase + 4] = (short) ((short) (indBase + 2) % (MAXCORNERSIND));
-				indicesBuffer[jBase + 5] = (short) ((short) (indBase + 3) % (MAXCORNERSIND));
+				indicesBuffer.put(jBase + 3, (short) ((short) (indBase + 1) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 4, (short) ((short) (indBase + 2) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 5, (short) ((short) (indBase + 3) % (MAXCORNERSIND)));
 				j++;
 				numEdgesEnabled++;
 			}

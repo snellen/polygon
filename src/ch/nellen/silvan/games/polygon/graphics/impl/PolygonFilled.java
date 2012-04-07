@@ -22,11 +22,12 @@ public class PolygonFilled extends PolygonModel {
 	}
 
 	public void render(IRenderContext rc) {
-		recalculateGeometry(rc.getVertexBuffer(), rc.getIndicesBuffer());
-		
-		GL10 gl = rc.getGl();
 		FloatBuffer vBuffer = rc.getGlVertexBuffer();
 		ShortBuffer iBuffer = rc.getGlIndicesBuffer();
+		
+		recalculateGeometry(vBuffer, iBuffer);
+		
+		GL10 gl = rc.getGl();
 
 		// Draw the polygon
 		gl.glColor4f(mColor.r, mColor.g, mColor.b, mColor.alpha);
@@ -35,23 +36,23 @@ public class PolygonFilled extends PolygonModel {
 		gl.glDrawElements(GL10.GL_TRIANGLES, NUMBER_OF_VERTICES*3, GL10.GL_UNSIGNED_SHORT, iBuffer);
 	}
 
-	private void recalculateGeometry(float[] vertexBuffer, short[] indicesBuffer) {
+	private void recalculateGeometry(FloatBuffer vertexBuffer, ShortBuffer indicesBuffer) {
 		int iBase = 0;
 		for (int i = 0; i < NUMBER_OF_VERTICES; ++i) {
 			iBase = i * 3;
-			vertexBuffer[iBase] = polygonPrototype[i][0] * mRadius; // Xi.1
-			vertexBuffer[iBase + 1] = polygonPrototype[i][1] * mRadius; // Yi.1
-			vertexBuffer[iBase + 2] = mZCoord; // Zi.1
+			vertexBuffer.put(iBase,polygonPrototype[i][0] * mRadius); // Xi.1
+			vertexBuffer.put(iBase + 1,polygonPrototype[i][1] * mRadius); // Yi.1
+			vertexBuffer.put(iBase + 2,mZCoord); // Zi.1
 			
-			indicesBuffer[iBase] = NUMBER_OF_VERTICES; // center point at last position
-			indicesBuffer[iBase + 1] = (short) i;
-			indicesBuffer[iBase + 2] = (short) (((short)(i+1))%NUMBER_OF_VERTICES);
+			indicesBuffer.put(iBase, (short) NUMBER_OF_VERTICES); // center point at last position
+			indicesBuffer.put(iBase + 1, (short) i);
+			indicesBuffer.put(iBase + 2, (short) (((short)(i+1))%NUMBER_OF_VERTICES));
 		}
 		// Center point
 		iBase = NUMBER_OF_VERTICES*3;
-		vertexBuffer[iBase] = 0.0f; // Xi.1
-		vertexBuffer[iBase + 1] = 0.0f; // Yi.1
-		vertexBuffer[iBase + 2] = 0.0f; // Zi.1
+		vertexBuffer.put(iBase,0.0f); // Xi.1
+		vertexBuffer.put(iBase + 1, 0.0f); // Yi.1
+		vertexBuffer.put(iBase + 2, 0.0f); // Zi.1
 		
 	}
 

@@ -24,7 +24,6 @@ public abstract class Sprite extends Renderable implements ISprite {
 	static FloatBuffer cTextureCoordsBuffer = null;
 	static ShortBuffer cIndiceBuffer = null;
 
-	private float quadCoords[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	private FloatBuffer mVertexBuffer = null;
 	protected int[] mTextureId = new int[1];
 
@@ -48,6 +47,15 @@ public abstract class Sprite extends Renderable implements ISprite {
 			cTextureCoordsBuffer = tbb.asFloatBuffer();
 			cTextureCoordsBuffer.put(texCoords);
 			cTextureCoordsBuffer.position(0);
+		}
+		
+		if (mVertexBuffer == null) {
+			float quadCoords[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+			ByteBuffer vbb = ByteBuffer.allocateDirect(quadCoords.length * 4);
+			vbb.order(ByteOrder.nativeOrder());
+			mVertexBuffer = vbb.asFloatBuffer();
+			mVertexBuffer.put(quadCoords);
+			mVertexBuffer.position(0);
 		}
 
 		mTextureId[0] = -1;
@@ -95,15 +103,10 @@ public abstract class Sprite extends Renderable implements ISprite {
 			int height = getHeight();
 
 			/* Quad */
-			quadCoords[3] = height;
-			quadCoords[4] = width;
-			quadCoords[5] = height;
-			quadCoords[6] = width;
-			ByteBuffer vbb = ByteBuffer.allocateDirect(quadCoords.length * 4);
-			vbb.order(ByteOrder.nativeOrder());
-			mVertexBuffer = vbb.asFloatBuffer();
-			mVertexBuffer.put(quadCoords);
-			mVertexBuffer.position(0);
+			mVertexBuffer.put(3, height);
+			mVertexBuffer.put(4, width);
+			mVertexBuffer.put(5, height);
+			mVertexBuffer.put(6, width);
 
 			if (mTextureId[0] < 0) {
 				gl.glGenTextures(1, mTextureId, 0);
