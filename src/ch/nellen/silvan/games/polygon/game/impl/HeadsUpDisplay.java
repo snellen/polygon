@@ -76,7 +76,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		float evX = event.getX();
 		float evY = event.getY();
 
-		boolean inputValid = event.getAction() == MotionEvent.ACTION_UP && mGameState.getAcceptInput();
+		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && mGameState.getAcceptInput());
 		
 		if (pauseButton.isVisible() && evX > pauseButton.getX()
 				&& evX < pauseButton.getX() + pauseButton.getWidth()
@@ -173,7 +173,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pauseButton.isVisible(false);
 			break;
 		}
-
 	}
 
 }

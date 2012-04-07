@@ -51,7 +51,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		private GameState mGameState = null;
 
 		public PolygonGame(Context context) {
-			
 			mGameState = new GameState();
 			mContext = context;
 			SharedPreferences prefs = mContext.getSharedPreferences(
@@ -66,7 +65,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 					mGameState);
 			mGameLogic = new GameLogic(mScene, mGameState);
 			mHandler = new Handler();
-
 		}
 
 		public float getCameraZ() {
@@ -135,7 +133,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	}
 
 	public void onDrawFrame(GL10 gl) {
-
 		// Update game
 		long currTime = SystemClock.uptimeMillis();
 		long timeElapsed = 0;
@@ -145,7 +142,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		mGame.update(timeElapsed);
 		lastUpdate = currTime;
 
-		/* Render 3D */
+		/* Begin render 3D */
 		// Redraw background color
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
@@ -160,8 +157,9 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 				gl.glPopMatrix();
 			}
 		}
+		/* End render 3D */
 
-		/* Render 2D */
+		/* Begin render 2D */
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
@@ -189,7 +187,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 			}
 		}
 
-		/* End Render 2D */
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 		gl.glDisable(GL10.GL_BLEND);
@@ -197,7 +194,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glPopMatrix();
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glPopMatrix();
-
+		/* End Render 2D */
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
