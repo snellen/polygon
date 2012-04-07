@@ -20,8 +20,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	private TextSprite pausedText;
 	private TextSprite totalTime;
 	private ImageSprite logo;
-	private ImageSprite leftKey;
-	private ImageSprite rightKey;
 
 	GameState mGameState = null;
 	private int mScreenWidth;
@@ -69,18 +67,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		logo.setX(0);
 		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
-
-		leftKey = new ImageSprite(resources, R.drawable.key_left);
-		leftKey.setX(0);
-		leftKey.setY(0);
-		leftKey.isVisible(false);
-		rc.getRenderer().registerRenderable2D(leftKey);
-
-		rightKey = new ImageSprite(resources, R.drawable.key_right);
-		rightKey.setX(0);
-		rightKey.setY(0);
-		rightKey.isVisible(false);
-		rc.getRenderer().registerRenderable2D(rightKey);
 	}
 
 	@Override
@@ -90,31 +76,28 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		float evX = event.getX();
 		float evY = event.getY();
 
-		if (mGameState.getAcceptInput()) {
-			if (pauseButton.isVisible() && evX > pauseButton.getX()
-					&& evX < pauseButton.getX() + pauseButton.getWidth()
-					&& evY > pauseButton.getY()
-					&& evY < pauseButton.getY() + pauseButton.getHeight()) {
-				// Touch on pause button
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					// Pause button released
-					mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
-				}
-				return true; // Event handled
-			}
+		boolean inputValid = event.getAction() == MotionEvent.ACTION_UP && mGameState.getAcceptInput();
+		
+		if (pauseButton.isVisible() && evX > pauseButton.getX()
+				&& evX < pauseButton.getX() + pauseButton.getWidth()
+				&& evY > pauseButton.getY()
+				&& evY < pauseButton.getY() + pauseButton.getHeight()) {
+			if (inputValid)
+				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+			return true; // Event handled
+		}
 
-			if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
-					|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
-				if (event.getAction() == MotionEvent.ACTION_UP)
-					mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
-				return true;
-			}
+		if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
+				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
+			if (inputValid)
+				mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
+			return true;
+		}
 
-			if (mGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
-				if (event.getAction() == MotionEvent.ACTION_UP)
-					mGameState.setCurrentPhase(IGameState.Phase.START);
-				return true;
-			}
+		if (mGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
+			if (inputValid)
+				mGameState.setCurrentPhase(IGameState.Phase.START);
+			return true;
 		}
 
 		return false;
@@ -150,18 +133,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY() + logo.getHeight() + 5);
-
-		int distTop = 90, distBorder = 5;
-
-		leftKey.setX(distBorder);
-		leftKey.setY(distTop);
-		leftKey.setHeight(screenHeight - 2 * distTop);
-		leftKey.setWidth(screenWidth / 6);
-
-		rightKey.setX(screenWidth - distBorder - screenWidth / 6);
-		rightKey.setY(distTop);
-		rightKey.setWidth(screenWidth / 6);
-		rightKey.setHeight(screenHeight - 2 * distTop);
 	}
 
 	@Override
@@ -178,8 +149,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			rightKey.isVisible(false);
-			leftKey.isVisible(false);
 			totalTime.setText("HIGHSCORE "
 					+ formatTime(mGameState.getHighscore()));
 			totalTime.setX(mScreenWidth - totalTime.getWidth());
@@ -188,8 +157,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			logo.isVisible(false);
 			pausedText.isVisible(false);
 			pauseButton.isVisible(true);
-			rightKey.isVisible(true);
-			leftKey.isVisible(true);
 			break;
 		case PAUSED:
 			logo.isVisible(true);
@@ -197,8 +164,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pausedText.setText("PAUSED, TAP TO CONTINUE");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			rightKey.isVisible(false);
-			leftKey.isVisible(false);
 			break;
 		case GAMEOVER:
 			logo.isVisible(true);
@@ -206,8 +171,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pausedText.setText("GAME OVER, TAP TO RETRY");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			rightKey.isVisible(false);
-			leftKey.isVisible(false);
 			break;
 		}
 

@@ -41,7 +41,7 @@ public class GameLogic implements IUpdatable, Observer {
 	private float mAngle = 0f;
 	private float rotationSpeed = 0.04f;
 	private float playerSpeed = 0.15f;
-	private float shrinkSpeed = 0.8f / 1000;
+	private float shrinkSpeed = 1f / 1000;
 
 	private ICollisionDetection collDec = null;
 	private IScene mScene = null;
@@ -60,7 +60,6 @@ public class GameLogic implements IUpdatable, Observer {
 		mGameState.setCameraZ(PAUSE_CAM_POSITION);
 		mGameState.setAcceptInput(true);
 		mGameState.addObserver((Observer) this);
-
 	}
 
 	public float getShrinkSpeed() {
@@ -115,7 +114,7 @@ public class GameLogic implements IUpdatable, Observer {
 
 		boolean cameraMoving = moveCamera(timeElapsed);
 		long totalTime = mGameState.getTimeElapsed();
-		
+
 		if (!cameraMoving
 				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			totalTime += timeElapsed;
@@ -182,10 +181,10 @@ public class GameLogic implements IUpdatable, Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		
+
 		if (arg1 == null)
 			return;
-		
+
 		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) arg1;
 		if (phaseUpdate.newPhase == GameState.Phase.RUNNING) {
 			mScene.getPlayerModel().isVisible(true);
@@ -210,6 +209,8 @@ public class GameLogic implements IUpdatable, Observer {
 				mGameState.setTimeElapsed(0);
 			}
 		}
+
+		mGameState.setPlayerAngularDir(0);
 	}
 
 }
