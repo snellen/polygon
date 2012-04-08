@@ -98,11 +98,12 @@ public class PolygonAdversary {
 					}
 
 					setEdges(polygon.getEdgesEnabled());
-					float relWidth = (phase % 2 == 0) ? 0.09f : 0.2f;
+					float relWidth = (phase % 2 == 0) ? 0.09f : 0.25f;
 					polygon.setRadius(maxR);
 					polygon.setWidth(relWidth * maxVisibleR);
 
 					phase++;
+					
 					if (phase == 5) {
 						currentConfig = getRandomConfig();
 						reset();
