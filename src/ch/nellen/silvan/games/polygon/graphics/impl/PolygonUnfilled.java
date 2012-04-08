@@ -21,7 +21,7 @@ public class PolygonUnfilled extends PolygonModel {
 	public void setWidth(float w) {
 		mWidth = w;
 	}
-	
+
 	public float getWidth() {
 		return mWidth;
 	}
@@ -30,23 +30,17 @@ public class PolygonUnfilled extends PolygonModel {
 		return mEdgeEnabled;
 	}
 
-	public void setColors(RGBAColor[] colors) {
-		assert (colors.length == NUMBER_OF_VERTICES);
-		// TODO
-	}
-
 	public void render(IRenderContext rc) {
 		FloatBuffer vBuffer = rc.getGlVertexBuffer();
 		ShortBuffer iBuffer = rc.getGlIndicesBuffer();
-		
+
 		recalculateGeometry(vBuffer, iBuffer);
 
 		GL10 gl = rc.getGl();
 
 		// Draw the polygon
-		gl.glColor4f(0.93671875f, 0.76953125f, 0.22265625f, 0.0f); // TODO:
-																	// multicolor
-																	// edges
+		gl.glColor4f(mColor.r, mColor.g, mColor.b, mColor.alpha);
+
 		gl.glRotatef(mAngle, 0.0f, 0.0f, 1.0f);
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vBuffer);
 		gl.glDrawElements(GL10.GL_TRIANGLES, numEdgesEnabled * 6, // 2 triangles
@@ -54,7 +48,8 @@ public class PolygonUnfilled extends PolygonModel {
 				GL10.GL_UNSIGNED_SHORT, iBuffer);
 	}
 
-	private void recalculateGeometry(FloatBuffer vertexBuffer, ShortBuffer indicesBuffer) {
+	private void recalculateGeometry(FloatBuffer vertexBuffer,
+			ShortBuffer indicesBuffer) {
 		float outerRadius = mRadius + mWidth;
 		int j = 0;
 		int iBase = 0;
@@ -73,13 +68,19 @@ public class PolygonUnfilled extends PolygonModel {
 				final int indBase = i * 2;
 				final int MAXCORNERSIND = NUMBER_OF_VERTICES * 2;
 				// Triangle 1
-				indicesBuffer.put(jBase,(short) ((short) (indBase) % (MAXCORNERSIND)));
-				indicesBuffer.put(jBase + 1, (short) ((short) (indBase + 1) % (MAXCORNERSIND)));
-				indicesBuffer.put(jBase + 2, (short) ((short) (indBase + 2) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase,
+						(short) ((short) (indBase) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 1,
+						(short) ((short) (indBase + 1) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 2,
+						(short) ((short) (indBase + 2) % (MAXCORNERSIND)));
 				// Triangle 2
-				indicesBuffer.put(jBase + 3, (short) ((short) (indBase + 1) % (MAXCORNERSIND)));
-				indicesBuffer.put(jBase + 4, (short) ((short) (indBase + 2) % (MAXCORNERSIND)));
-				indicesBuffer.put(jBase + 5, (short) ((short) (indBase + 3) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 3,
+						(short) ((short) (indBase + 1) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 4,
+						(short) ((short) (indBase + 2) % (MAXCORNERSIND)));
+				indicesBuffer.put(jBase + 5,
+						(short) ((short) (indBase + 3) % (MAXCORNERSIND)));
 				j++;
 				numEdgesEnabled++;
 			}

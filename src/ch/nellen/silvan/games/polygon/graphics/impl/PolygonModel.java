@@ -3,8 +3,8 @@ package ch.nellen.silvan.games.polygon.graphics.impl;
 import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 
-
-public abstract class PolygonModel extends Renderable implements IRenderable, IPolygonModel {
+public abstract class PolygonModel extends Renderable implements IRenderable,
+		IPolygonModel {
 
 	// Cache for precalculated corner coordinates
 	// Dimension 1: Vertices
@@ -19,9 +19,11 @@ public abstract class PolygonModel extends Renderable implements IRenderable, IP
 
 	protected float mAngle;
 
+	protected RGBAColor mColor = new RGBAColor(0, 0, 0, 1);
+
 	public PolygonModel() {
 		super();
-		
+
 		mAngle = 0.0f;
 		/* Init PolygonPrototype */
 		if (polygonPrototype == null) {
@@ -36,17 +38,23 @@ public abstract class PolygonModel extends Renderable implements IRenderable, IP
 				angle += dAngle;
 			}
 		}
+		setColor(((float) 238) / 255, ((float) 244) / 255, 0, 1);
 	}
 
-	/* (non-Javadoc)
-	 * @see ch.nellen.silvan.games.polygon.graphics.IPolygonModel#setRadius(float)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.nellen.silvan.games.polygon.graphics.IPolygonModel#setRadius(float)
 	 */
 	@Override
 	public void setRadius(float r) {
 		mRadius = r;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ch.nellen.silvan.games.polygon.graphics.IPolygonModel#getRadius()
 	 */
 	@Override
@@ -54,7 +62,9 @@ public abstract class PolygonModel extends Renderable implements IRenderable, IP
 		return mRadius;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ch.nellen.silvan.games.polygon.graphics.IPolygonModel#getZCoord()
 	 */
 	@Override
@@ -62,24 +72,42 @@ public abstract class PolygonModel extends Renderable implements IRenderable, IP
 		return mZCoord;
 	}
 
-	/* (non-Javadoc)
-	 * @see ch.nellen.silvan.games.polygon.graphics.IPolygonModel#setZCoord(float)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.nellen.silvan.games.polygon.graphics.IPolygonModel#setZCoord(float)
 	 */
 	@Override
 	public void setZCoord(float zCoord) {
 		this.mZCoord = zCoord;
 	}
-	
+
 	public void setAngle(float angle) {
 		mAngle = angle;
-		while(mAngle < 0f)
+		while (mAngle < 0f)
 			mAngle += 360f;
-		while(mAngle > 360f)
+		while (mAngle > 360f)
 			mAngle -= 360f;
 	}
 
 	public float getAngle() {
 		return mAngle;
+	}
+
+	public void setColor(float r, float g, float b, float a) {
+		mColor.r = r;
+		mColor.g = g;
+		mColor.b = b;
+		mColor.alpha = a;
+	}
+
+	public void setColor(RGBAColor c) {
+		setColor(c.r, c.g, c.b, c.alpha);
+	}
+
+	public RGBAColor getColor() {
+		return mColor;
 	}
 
 }

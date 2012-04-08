@@ -9,16 +9,9 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
 public class PolygonFilled extends PolygonModel {
 
-	RGBAColor mColor;
-
 	public PolygonFilled(IRenderContext rc) {
 		super();
 		rc.getRenderer().registerRenderable3D(this);
-		mColor = new RGBAColor(0f, 0f, 0f, 1f);
-	}
-
-	public void setColor(RGBAColor color) {
-		mColor = color;
 	}
 
 	public void render(IRenderContext rc) {

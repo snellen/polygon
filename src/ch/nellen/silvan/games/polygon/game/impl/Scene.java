@@ -5,7 +5,6 @@ import ch.nellen.silvan.games.polygon.graphics.IScene;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonFilled;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
-import ch.nellen.silvan.games.polygon.graphics.impl.RGBAColor;
 
 public class Scene implements IScene {
 
@@ -23,11 +22,10 @@ public class Scene implements IScene {
 
 		mCenterPolygon = new PolygonFilled(rc);
 		mCenterPolygon.setZCoord(0.011f);
-		mCenterPolygon.setColor(new RGBAColor(0f, 0f, 0f, 1.0f));
+		mCenterPolygon.setColor(0, 0, 0, 1);
 		mCenterPolygonBorder = new PolygonFilled(rc);
 		mCenterPolygonBorder.setZCoord(0.011f);
-		mCenterPolygonBorder.setColor(new RGBAColor(0.93671875f, 0.76953125f,
-				0.22265625f, 1.0f));
+		;
 
 		mPlayerModel = new PlayerModel(rc);
 		mPlayerModel.setAngle(90);
