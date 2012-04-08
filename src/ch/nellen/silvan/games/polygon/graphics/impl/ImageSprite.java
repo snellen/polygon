@@ -11,7 +11,8 @@ public class ImageSprite extends Sprite {
 	private Bitmap mBitmap = null;
 
 	public ImageSprite(Resources resource, int id) {
-		mBitmap = BitmapFactory.decodeResource(resource, id);
+		//Get the texture from the Android resource directory
+    	mBitmap = BitmapFactory.decodeResource(resource, id);
 		mHeight = mBitmap.getHeight();
 		mWidth = mBitmap.getWidth();
 	}
@@ -49,6 +50,16 @@ public class ImageSprite extends Sprite {
 	@Override
 	Bitmap getTexture() {
 		return mBitmap;
+	}
+
+	@Override
+	protected int getWidthOnScreen() {
+		return getWidth();
+	}
+
+	@Override
+	protected int getHeightOnScreen() {
+		return getHeight();
 	}
 
 }

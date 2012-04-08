@@ -63,7 +63,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		rc.getRenderer().registerRenderable2D(pausedText);
 
 		logo = new ImageSprite(resources, R.drawable.logo);
-		logo.scale(1.3f);
 		logo.setX(0);
 		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
@@ -132,7 +131,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		totalTime.setY(10);
 
 		float scale = (float) (mScreenWidth * 0.8 / logo.getWidth());
-		logo.scale(scale);
+		logo.setWidth((int) (scale*266));
+		logo.setHeight((int) (scale*71));
 		logo.setX((mScreenWidth - logo.getWidth()) / 2);
 		logo.setY((mScreenHeight - logo.getHeight()) / 2);
 

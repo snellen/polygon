@@ -99,8 +99,8 @@ public abstract class Sprite extends Renderable implements ISprite {
 			Bitmap bitmap = getTexture();
 			mRefresh = false;
 			
-			int width = getWidth();
-			int height = getHeight();
+			int width = getWidthOnScreen();
+			int height = getHeightOnScreen();
 
 			/* Quad */
 			mVertexBuffer.put(3, height);
@@ -112,6 +112,8 @@ public abstract class Sprite extends Renderable implements ISprite {
 				gl.glGenTextures(1, mTextureId, 0);
 			}
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, mTextureId[0]);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
 			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 		} else {
 			// Load texture
@@ -126,4 +128,8 @@ public abstract class Sprite extends Renderable implements ISprite {
 	}
 
 	abstract Bitmap getTexture();
+	/* Returns the width of this sprite on the screen */
+	protected abstract int getWidthOnScreen();
+	/* Returns the height of this sprite on the screen */
+	protected abstract int getHeightOnScreen();
 }
