@@ -76,8 +76,9 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		float evX = event.getX();
 		float evY = event.getY();
 
-		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && mGameState.getAcceptInput());
-		
+		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && mGameState
+				.getAcceptInput());
+
 		if (pauseButton.isVisible() && evX > pauseButton.getX()
 				&& evX < pauseButton.getX() + pauseButton.getWidth()
 				&& evY > pauseButton.getY()
@@ -106,12 +107,16 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	@Override
 	public void update(long timeElapsed) {
 		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
-			String timeString;
-			long time = mGameState.getTimeElapsed();
-			timeString = "TIME " + formatTime(time);
-			totalTime.setText(timeString);
-			totalTime.setX(mScreenWidth - totalTime.getWidth());
+			updateTimeDisplay();
 		}
+	}
+
+	private void updateTimeDisplay() {
+		String timeString;
+		long time = mGameState.getTimeElapsed();
+		timeString = "TIME " + formatTime(time);
+		totalTime.setText(timeString);
+		totalTime.setX(mScreenWidth - totalTime.getWidth());
 	}
 
 	String formatTime(long time) {
@@ -171,6 +176,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pausedText.setText("GAME OVER, TAP TO RETRY");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
+			updateTimeDisplay();
 			break;
 		}
 	}

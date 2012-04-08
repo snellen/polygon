@@ -146,12 +146,17 @@ public class GameLogic implements IUpdatable, Observer {
 			mScene.getCenterPolygonBorder().setColor(mColor);
 		}
 
+		PlayerModel playerModel = mScene.getPlayerModel();
+		float playerAngle = playerModel.getAngle();
 		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING
 				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
 			updateAngle(timeElapsed);
 			// Rotate center
 			mScene.getCenterPolygonBorder().setAngle(mAngle);
 			mScene.getCenterPolygon().setAngle(mAngle);
+			// Rotate player
+			playerAngle += rotationSpeed * timeElapsed;
+			playerModel.setAngle(playerAngle);
 		}
 
 		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
@@ -180,20 +185,14 @@ public class GameLogic implements IUpdatable, Observer {
 				p.setAngle(mAngle);
 			}
 			// Update player
-			PlayerModel playerModel = mScene.getPlayerModel();
-			float playerAngle = playerModel.getAngle();
 			playerAngle += mGameState.getPlayerAngluarDir() * PLAYERSPEED
 					* timeElapsed;
-			playerAngle += rotationSpeed * timeElapsed;
 			playerModel.setAngle(playerAngle);
 
 			// Collision
 			if (collDec.isPlayerCollided(mScene)) {
-				playerModel.setColor(new RGBAColor(0f, 0f, 1f, 1.0f));
-				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
 				mGameState.setHighscore(totalTime);
-			} else {
-				playerModel.setColor(new RGBAColor(1f, 0f, 0f, 1.0f));
+				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
 			}
 		}
 	}
