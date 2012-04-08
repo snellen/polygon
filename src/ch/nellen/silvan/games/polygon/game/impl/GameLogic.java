@@ -221,6 +221,7 @@ public class GameLogic implements IUpdatable, Observer {
 		if (phaseUpdate.newPhase == GameState.Phase.RUNNING) {
 			mScene.getPlayerModel().isVisible(true);
 			if (phaseUpdate.oldPhase == GameState.Phase.START) {
+				polyAdv.reset();
 				// New game started, init polygons
 				mMaxRadius = mMaxVisibleRadius;
 				PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
