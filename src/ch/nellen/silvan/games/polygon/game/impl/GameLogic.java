@@ -14,24 +14,6 @@ import ch.nellen.silvan.games.polygon.graphics.impl.RGBAColor;
 
 public class GameLogic implements IUpdatable, Observer {
 
-	private class PolygonConfigurator {
-		// enum State {
-		//
-		// }
-
-		void configureNextPolygon(PolygonUnfilled polygon) {
-			boolean[] edgeEnabled = polygon.getEdgesEnabled();
-			for (int j = 0; j < edgeEnabled.length; ++j) {
-				edgeEnabled[j] = (Math.random() < 0.3);
-			}
-			polygon.setRadius((float) (mMaxRadius + (Math.random() * 0.05 + 0.03)
-					* mMaxVisibleRadius));
-			polygon.setWidth((float) (Math.random() * 0.005 + 0.09)
-					* mMaxVisibleRadius);
-			mMaxRadius = polygon.getWidth() + polygon.getRadius();
-		}
-	}
-
 	private static final float PAUSE_CAM_POSITION = 2.1f;
 	private static final float CAM_POSITION = 5f;
 	private static final float CAM_SPEED = 4f / 1000;
@@ -39,14 +21,14 @@ public class GameLogic implements IUpdatable, Observer {
 	private float mMaxRadius = 0;
 
 	private float mAngle = 0f;
-	private float rotationSpeed = 0.04f;
-	private float playerSpeed = 0.15f;
-	private float shrinkSpeed = 1f / 1000;
+	private float rotationSpeed = 0.08f;
+	private float playerSpeed = 0.35f;
+	private float shrinkSpeed = 1.5f / 1000;
 
 	private ICollisionDetection collDec = null;
 	private IScene mScene = null;
 	private GameState mGameState = null;
-	private PolygonConfigurator polyConfig = new PolygonConfigurator();
+	private PolygonAdversary polyAdv = new PolygonAdversary();
 
 	public GameLogic(IScene scene, GameState gameState) {
 		super();
@@ -139,7 +121,8 @@ public class GameLogic implements IUpdatable, Observer {
 				if (!cameraMoving) {
 					float r = p.getRadius() - shrinkSpeed * timeElapsed;
 					if (r + p.getWidth() < mScene.getCenterRadius()) {
-						polyConfig.configureNextPolygon(p);
+						polyAdv.configureNextPolygon(p, mMaxVisibleRadius, mMaxRadius);
+						mMaxRadius = p.getWidth() + p.getRadius();
 					} else {
 						p.setRadius(r);
 					}
@@ -157,8 +140,8 @@ public class GameLogic implements IUpdatable, Observer {
 			// Collision
 			if (collDec.isPlayerCollided(mScene)) {
 				playerModel.setColor(new RGBAColor(0f, 0f, 1f, 1.0f));
-				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
-				mGameState.setHighscore(totalTime);
+//				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
+//				mGameState.setHighscore(totalTime);
 			} else {
 				playerModel.setColor(new RGBAColor(1f, 0f, 0f, 1.0f));
 			}
@@ -195,7 +178,8 @@ public class GameLogic implements IUpdatable, Observer {
 				for (int i = 0; i < mPolygonModels.length; ++i) {
 					PolygonUnfilled p = mPolygonModels[i];
 					p.isVisible(true);
-					polyConfig.configureNextPolygon(p);
+					polyAdv.configureNextPolygon(p, mMaxVisibleRadius, mMaxRadius);
+					mMaxRadius = p.getWidth() + p.getRadius();
 				}
 			}
 		} else if (phaseUpdate.newPhase == GameState.Phase.START) {
@@ -209,8 +193,6 @@ public class GameLogic implements IUpdatable, Observer {
 				mGameState.setTimeElapsed(0);
 			}
 		}
-
-		mGameState.setPlayerAngularDir(0);
 	}
 
 }

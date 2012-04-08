@@ -68,6 +68,7 @@ public class GameController implements IInputHandler, Observer {
 			rightKey.isVisible(false);
 			leftKey.isVisible(false);
 		}
+		mGameState.setPlayerAngularDir(0);
 	}
 	
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
