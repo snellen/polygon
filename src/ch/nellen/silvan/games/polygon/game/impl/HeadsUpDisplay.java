@@ -19,7 +19,7 @@ import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 	public static int MAX_WIDTH_FROM_TOP = 90;
-	
+
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
 	private TextSprite totalTime;
@@ -70,7 +70,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		fpsDisplay.setTextSize(14);
 		fpsDisplay.isVisible(false);
 		rc.getRenderer().registerRenderable2D(fpsDisplay);
-		
+
 		pausedText = new TextSprite();
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
 		pausedText.setTextColor(textColor);
@@ -121,7 +121,9 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 		if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
 				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
-			if (inputValid)
+			if (inputValid
+					&& (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED)
+					|| startTimer <= 0)
 				mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
 			return true;
 		}
@@ -135,21 +137,26 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		return false;
 	}
 
-	static long lastFpsMeasure = 0;//ms
+	static long startTimer = 0;
+	static long lastFpsMeasure = 0;// ms
 	static int frames = 0;
+
 	@Override
 	public void update(long timeElapsed) {
-		
+
+		if (startTimer > 0)
+			startTimer -= timeElapsed;
+
 		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
 			updateTimeDisplay();
 		}
-		
-		if(fpsDisplay.isVisible()) {
+
+		if (fpsDisplay.isVisible()) {
 			lastFpsMeasure += timeElapsed;
 			frames++;
-			if(frames >= 25) {
-				float fps = ((float)frames*1000)/lastFpsMeasure;
-				fpsDisplay.setText("FPS "+String.format("%02.2f", fps));
+			if (frames >= 25) {
+				float fps = ((float) frames * 1000) / lastFpsMeasure;
+				fpsDisplay.setText("FPS " + String.format("%02.2f", fps));
 				fpsDisplay.setX(mScreenWidth - fpsDisplay.getWidth());
 				lastFpsMeasure = 0;
 				frames = 0;
@@ -177,10 +184,10 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
 		mScreenWidth = screenWidth;
 		mScreenHeight = screenHeight;
-		
-		MAX_WIDTH_FROM_TOP = mScreenHeight/8;
-		DIST_FROM_SIDE = mScreenWidth/50;
-		DIST_FROM_TOP =  mScreenHeight/100;
+
+		MAX_WIDTH_FROM_TOP = mScreenHeight / 8;
+		DIST_FROM_SIDE = mScreenWidth / 50;
+		DIST_FROM_TOP = mScreenHeight / 100;
 
 		logo.setWidth((int) (mScreenWidth));
 		logo.setHeight((int) (mScreenHeight * 0.3));
@@ -189,7 +196,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 		totalTime.setTextSize(52 * mScreenHeight / 600);
 		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_SIDE);
-		totalTime.setY(Math.min(MAX_WIDTH_FROM_TOP-totalTime.getHeight(), DIST_FROM_TOP));
+		totalTime.setY(Math.min(MAX_WIDTH_FROM_TOP - totalTime.getHeight(),
+				DIST_FROM_TOP));
 
 		pausedText.setTextSize(78 * mScreenHeight / 600);
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
@@ -197,7 +205,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 		pauseButton.setTextSize(52 * mScreenHeight / 600);
 		pauseButton.setX(DIST_FROM_SIDE);
-		pauseButton.setY(Math.min(MAX_WIDTH_FROM_TOP-pauseButton.getHeight(), DIST_FROM_TOP));
+		pauseButton.setY(Math.min(MAX_WIDTH_FROM_TOP - pauseButton.getHeight(),
+				DIST_FROM_TOP));
 
 		fpsDisplay.setX(mScreenWidth - fpsDisplay.getWidth());
 		fpsDisplay.setY(mScreenHeight - fpsDisplay.getHeight());
@@ -213,6 +222,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) data;
 		switch (phaseUpdate.newPhase) {
 		case START:
+			startTimer = 250;
 			logo.isVisible(true);
 			pausedText.isVisible(true);
 			pausedText.setText("TAP TO START");
