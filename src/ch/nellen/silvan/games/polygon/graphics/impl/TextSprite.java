@@ -6,7 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Typeface;
+import android.graphics.PorterDuff;
 
 public class TextSprite extends Sprite {
 
@@ -15,6 +17,11 @@ public class TextSprite extends Sprite {
 	private int mPaddingV = 0;
 	private int mPaddingH = 0;
 	private String mText = "";
+
+	private int maxWidth = 0;
+	private int maxHeight = 0;
+	
+	private static Paint cEraserPaint = null;
 
 	public TextSprite() {
 		super();
@@ -27,6 +34,12 @@ public class TextSprite extends Sprite {
 
 		mBackgroundPaint = new Paint();
 		mBackgroundPaint.setColor(Color.WHITE);
+		
+		if(cEraserPaint == null) {
+			cEraserPaint = new Paint();
+			cEraserPaint.setAlpha(0);
+			cEraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+		}
 	}
 
 	public void setText(String text) {
@@ -97,6 +110,8 @@ public class TextSprite extends Sprite {
 	}
 
 	private void onTextChanged() {
+		maxWidth = Math.max(maxWidth, getWidth());
+		maxHeight = Math.max(maxHeight, getHeight());
 		mRefresh = true;
 	}
 
@@ -109,9 +124,10 @@ public class TextSprite extends Sprite {
 					|| mBitmap.getWidth() < getWidth()) {
 				createNewBitmap();
 			}
-
-			mBitmap.eraseColor(Color.TRANSPARENT);
-			canvas.drawRect(0, 0, getWidth(), getHeight(), mBackgroundPaint);
+			canvas.drawRect(0, 0, maxWidth, maxHeight, cEraserPaint);
+			maxWidth = getWidth();
+			maxHeight = getHeight();
+			canvas.drawRect(0, 0, maxWidth, maxHeight, mBackgroundPaint);
 			FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 			canvas.drawText(mText, mPaddingH, Math.abs(fontMetrics.ascent)
 					+ mPaddingV, mTextPaint);
