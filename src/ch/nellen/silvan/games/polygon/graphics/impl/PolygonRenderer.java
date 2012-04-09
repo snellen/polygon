@@ -24,7 +24,6 @@ import ch.nellen.silvan.games.polygon.game.impl.Scene;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
-import ch.nellen.silvan.games.polygon.graphics.IScene;
 
 public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
@@ -45,7 +44,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		private Context mContext;
 
 		private GameLogic mGameLogic = null;
-		private IScene mScene = null;
+		private Scene mScene = null;
 		private GameController mGameController = null;
 		private HeadsUpDisplay mHud = null;
 		private GameState mGameState = null;

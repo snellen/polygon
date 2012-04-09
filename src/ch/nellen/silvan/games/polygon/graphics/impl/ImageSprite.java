@@ -54,12 +54,12 @@ public class ImageSprite extends Sprite {
 
 	@Override
 	protected int getWidthOnScreen() {
-		return getWidth();
+		return mWidth;
 	}
 
 	@Override
 	protected int getHeightOnScreen() {
-		return getHeight();
+		return mHeight;
 	}
 
 }

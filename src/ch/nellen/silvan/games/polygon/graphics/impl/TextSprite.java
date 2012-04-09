@@ -6,9 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
 import android.graphics.Typeface;
-import ch.nellen.silvan.games.polygon.graphics.ITextSprite;
 
-public class TextSprite extends Sprite implements ITextSprite {
+public class TextSprite extends Sprite {
 
 	Paint mTextPaint = null;
 	Paint mBackgroundPaint = null;
@@ -29,7 +28,6 @@ public class TextSprite extends Sprite implements ITextSprite {
 		mBackgroundPaint.setColor(Color.WHITE);
 	}
 
-	@Override
 	public void setText(String text) {
 		if (!text.equals(mText)) {
 			mText = text;
@@ -37,12 +35,10 @@ public class TextSprite extends Sprite implements ITextSprite {
 		}
 	}
 
-	@Override
 	public String getText() {
 		return mText;
 	}
 
-	@Override
 	public void setTextSize(float textSize) {
 		if (textSize != mTextPaint.getTextSize()) {
 			mTextPaint.setTextSize(textSize);
@@ -50,12 +46,10 @@ public class TextSprite extends Sprite implements ITextSprite {
 		}
 	}
 
-	@Override
 	public float getTextSize() {
 		return mTextPaint.getTextSize();
 	}
 
-	@Override
 	public void setPaddingHorizontal(int padding) {
 		if (mPaddingH != padding) {
 			mPaddingH = padding;
@@ -63,12 +57,10 @@ public class TextSprite extends Sprite implements ITextSprite {
 		}
 	}
 
-	@Override
 	public int getPaddingHorizontal() {
 		return mPaddingH;
 	}
 
-	@Override
 	public void setPaddingVertical(int padding) {
 		if (mPaddingV != padding) {
 			mPaddingV = padding;
@@ -76,12 +68,10 @@ public class TextSprite extends Sprite implements ITextSprite {
 		}
 	}
 
-	@Override
 	public int getPaddingVertical() {
 		return mPaddingV;
 	}
 
-	@Override
 	public void setBackgroundColor(int color) {
 		if (mBackgroundPaint.getColor() != color) {
 			mBackgroundPaint.setColor(color);
@@ -89,12 +79,10 @@ public class TextSprite extends Sprite implements ITextSprite {
 		}
 	}
 
-	@Override
 	public int getBackgroundColor() {
 		return mBackgroundPaint.getColor();
 	}
 
-	@Override
 	public void setTextColor(int color) {
 		if (mTextPaint.getColor() != color) {
 			mTextPaint.setColor(color);
@@ -103,7 +91,6 @@ public class TextSprite extends Sprite implements ITextSprite {
 
 	}
 
-	@Override
 	public int getTextColor() {
 		return mTextPaint.getColor();
 	}
@@ -176,12 +163,10 @@ public class TextSprite extends Sprite implements ITextSprite {
 		return mBitmap != null ? mBitmap.getHeight() : 0;
 	}
 
-	@Override
 	public Typeface getTypeface() {
 		return mTextPaint.getTypeface();
 	}
 
-	@Override
 	public void setTypeface(Typeface tf) {
 		if (!mTextPaint.getTypeface().equals(tf) && tf != null) {
 			mTextPaint.setTypeface(tf);

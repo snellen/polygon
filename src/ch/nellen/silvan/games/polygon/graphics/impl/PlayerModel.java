@@ -5,10 +5,9 @@ import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import ch.nellen.silvan.games.polygon.graphics.IPlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
-public class PlayerModel extends Renderable implements IPlayerModel {
+public class PlayerModel extends Renderable {
 
 	
 	private float mRadius;
@@ -63,12 +62,10 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 		indicesBuffer.put(2, (short) 2);
 	}
 	
-	@Override
 	public void setRadius(float r) {
 		mRadius = r;
 	}
 
-	@Override
 	public float getRadius() {
 		return mRadius;
 	}
@@ -81,7 +78,6 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 		return triangleCoords[4];
 	}
 	
-	@Override
 	public void setAngle(float angle) {
 		mAngle = angle;
 		while(mAngle < 0f)
@@ -90,7 +86,6 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 			mAngle -= 360f;
 	}
 
-	@Override
 	public float getAngle() {
 		return mAngle;
 	}
@@ -118,7 +113,6 @@ public class PlayerModel extends Renderable implements IPlayerModel {
 		return 3;
 	}
 
-	@Override
 	public float[] getCoords() {
 		float[] res = new float[2];
 		float angleRad = (float) (mAngle*Math.PI/180f);

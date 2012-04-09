@@ -1,4 +1,4 @@
-package ch.nellen.silvan.games.polygon.graphics;
+package ch.nellen.silvan.games.polygon.graphics.impl;
 
 public class Utils {
 	public static float dotProd(float[] v1, float[] v2) {

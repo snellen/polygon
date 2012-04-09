@@ -3,10 +3,8 @@ package ch.nellen.silvan.games.polygon.game.impl;
 import java.util.Observable;
 import java.util.Observer;
 
-import ch.nellen.silvan.games.polygon.game.ICollisionDetection;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
-import ch.nellen.silvan.games.polygon.graphics.IScene;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
@@ -33,12 +31,12 @@ public class GameLogic implements IUpdatable, Observer {
 	private float rotationSpeed = 0.08f;
 	private float shrinkSpeed = 1.5f / 1000;
 
-	private ICollisionDetection collDec = null;
-	private IScene mScene = null;
+	private CollisionDetection collDec = null;
+	private Scene mScene = null;
 	private GameState mGameState = null;
 	private PolygonAdversary polyAdv = new PolygonAdversary();
 
-	public GameLogic(IScene scene, GameState gameState) {
+	public GameLogic(Scene scene, GameState gameState) {
 		super();
 
 		collDec = new CollisionDetection();

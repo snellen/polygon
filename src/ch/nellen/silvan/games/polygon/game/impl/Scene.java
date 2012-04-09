@@ -1,12 +1,11 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
-import ch.nellen.silvan.games.polygon.graphics.IScene;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonFilled;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
 
-public class Scene implements IScene {
+public class Scene {
 
 	private PolygonUnfilled[] mPolygonModels = null;
 	private PolygonFilled mCenterPolygon = null;
@@ -59,7 +58,6 @@ public class Scene implements IScene {
 		return mPlayerModel;
 	}
 
-	@Override
 	public void onMaxVisibleRadiusChanged(float mMaxVisibleRadius) {
 		CENTER_RADIUS = mMaxVisibleRadius * 0.09f;
 		CENTER_WIDTH = mMaxVisibleRadius * 0.01f;

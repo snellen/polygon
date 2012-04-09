@@ -1,15 +1,12 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
-import ch.nellen.silvan.games.polygon.game.ICollisionDetection;
 import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
-import ch.nellen.silvan.games.polygon.graphics.IScene;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
 
-public class CollisionDetection implements ICollisionDetection {
+public class CollisionDetection {
 
-	@Override
-	public boolean isPlayerCollided(IScene scene) {
+	public boolean isPlayerCollided(Scene scene) {
 		PolygonUnfilled[] polygons = scene.getPolygonModels();
 		PlayerModel player = scene.getPlayerModel();
 		for (int i = 0; i < polygons.length; ++i) {
