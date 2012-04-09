@@ -3,10 +3,11 @@ package ch.nellen.silvan.games.polygon.game.impl;
 import java.util.Observable;
 import java.util.Observer;
 
-import ch.nellen.silvan.games.R;
-import android.content.res.Resources;
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
+import ch.nellen.silvan.games.R;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
@@ -25,31 +26,34 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	private int mScreenWidth;
 	private int mScreenHeight;
 
-	public HeadsUpDisplay(Resources resources, IRenderContext rc,
+	private static final int DIST_FROM_BORDER = 20;
+	private static final int DIST_FROM_TOP = 10;
+
+	public HeadsUpDisplay(Context context, IRenderContext rc,
 			GameState gameState) {
 		super();
 
 		mGameState = gameState;
 		mGameState.addObserver(this);
 
-		int background = Color.argb(128, (int) (0.93671875f * 255),
-				(int) (0.76953125f * 255), (int) (0.22265625f * 255));
+		int background = Color.argb(128, (int) (0.3f * 255),
+				(int) (0.3f * 255), (int) (0.3f * 255));
+		int textColor = Color.argb(255, (int) (0.93671875f * 255),
+				(int) (0.16953125f * 255), (int) (0.02265625f * 255));
 		pauseButton = new TextSprite();
 		pauseButton.setBackgroundColor(background);
-		pauseButton.setTextColor(background | 0xff000000);
-		pauseButton.setX(20);
-		pauseButton.setY(10);
-		pauseButton.setTextSize(24);
+		pauseButton.setTextColor(textColor);
+		pauseButton.setX(DIST_FROM_BORDER);
+		pauseButton.setY(DIST_FROM_TOP);
 		pauseButton.setText("PAUSE");
-		pauseButton.setPaddingHorizontal(10);
-		pauseButton.setPaddingVertical(20);
+		pauseButton.setPaddingHorizontal(15);
+		pauseButton.setPaddingVertical(10);
 		pauseButton.isVisible(false);
 		rc.getRenderer().registerRenderable2D(pauseButton);
 
 		totalTime = new TextSprite();
 		totalTime.setBackgroundColor(background);
-		totalTime.setTextColor(background | 0xff000000);
-		totalTime.setTextSize(24);
+		totalTime.setTextColor(textColor);
 		totalTime.setText("HIGHSCORE " + formatTime(mGameState.getHighscore()));
 		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setPaddingHorizontal(5);
@@ -57,15 +61,23 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 		pausedText = new TextSprite();
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
-		pausedText.setTextColor(background | 0xff000000);
-		pausedText.setTextSize(40);
+		pausedText.setTextColor(textColor);
 		pausedText.setText("TAP TO START");
 		rc.getRenderer().registerRenderable2D(pausedText);
 
-		logo = new ImageSprite(resources, R.drawable.logo);
+		logo = new ImageSprite(context.getResources(), R.drawable.logo);
 		logo.setX(0);
 		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
+
+		Typeface tf = Typeface.createFromAsset(context.getAssets(),
+				"It_wasn_t_me.ttf");
+		if (tf != null) {
+			pauseButton.setTypeface(tf);
+			pausedText.setTypeface(tf);
+			totalTime.setTypeface(tf);
+		}
+
 	}
 
 	@Override
@@ -114,8 +126,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		String timeString;
 		long time = mGameState.getTimeElapsed();
 		timeString = "TIME " + formatTime(time);
-		totalTime.setText(timeString);
-		totalTime.setX(mScreenWidth - totalTime.getWidth());
+		setTimeText(timeString);
+	}
+
+	private void setTimeText(String txt) {
+		totalTime.setText(txt);
+		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_BORDER);
 	}
 
 	String formatTime(long time) {
@@ -127,17 +143,21 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		mScreenWidth = screenWidth;
 		mScreenHeight = screenHeight;
 
-		totalTime.setX(mScreenWidth - totalTime.getWidth());
-		totalTime.setY(10);
-
-		float scale = (float) (mScreenWidth * 0.8 / logo.getWidth());
-		logo.setWidth((int) (scale*266));
-		logo.setHeight((int) (scale*71));
+		logo.setWidth((int) (mScreenWidth));
+		logo.setHeight((int) (mScreenHeight * 0.3));
 		logo.setX((mScreenWidth - logo.getWidth()) / 2);
 		logo.setY((mScreenHeight - logo.getHeight()) / 2);
+		
+		totalTime.setTextSize(52 * screenHeight / 600);
+		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_BORDER);
+		totalTime.setY(10);
 
+		pausedText.setTextSize(78 * screenHeight / 600);
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY() + logo.getHeight() + 5);
+
+		pauseButton.setTextSize(52 * screenHeight / 600);
+		
 	}
 
 	@Override
@@ -154,9 +174,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			totalTime.setText("HIGHSCORE "
-					+ formatTime(mGameState.getHighscore()));
-			totalTime.setX(mScreenWidth - totalTime.getWidth());
+			setTimeText("HIGHSCORE " + formatTime(mGameState.getHighscore()));
 			break;
 		case RUNNING:
 			logo.isVisible(false);

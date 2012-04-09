@@ -1,5 +1,7 @@
 package ch.nellen.silvan.games.polygon.graphics;
 
+import android.graphics.Typeface;
+
 public interface ITextSprite extends IRenderable, ISprite {
 	void setText(String text);
 
@@ -28,4 +30,8 @@ public interface ITextSprite extends IRenderable, ISprite {
 	void setBackgroundColor(int color);
 
 	int getBackgroundColor();
+	
+	Typeface getTypeface();
+	
+	void setTypeface(Typeface tf);
 }

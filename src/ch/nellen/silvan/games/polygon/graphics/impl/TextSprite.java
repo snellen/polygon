@@ -175,4 +175,17 @@ public class TextSprite extends Sprite implements ITextSprite {
 	protected int getHeightOnScreen() {
 		return mBitmap != null ? mBitmap.getHeight() : 0;
 	}
+
+	@Override
+	public Typeface getTypeface() {
+		return mTextPaint.getTypeface();
+	}
+
+	@Override
+	public void setTypeface(Typeface tf) {
+		if (!mTextPaint.getTypeface().equals(tf) && tf != null) {
+			mTextPaint.setTypeface(tf);
+			onTextChanged();
+		}
+	}
 }

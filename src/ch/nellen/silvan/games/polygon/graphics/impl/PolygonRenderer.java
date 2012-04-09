@@ -59,9 +59,9 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 			mGameState.addObserver(this);
 			
 			mScene = new Scene(mRenderContext);
-			mHud = new HeadsUpDisplay(context.getResources(), mRenderContext,
+			mHud = new HeadsUpDisplay(context, mRenderContext,
 					mGameState);
-			mGameController = new GameController(context.getResources(), mRenderContext,
+			mGameController = new GameController(context, mRenderContext,
 					mGameState);
 			mGameLogic = new GameLogic(mScene, mGameState);
 			mHandler = new Handler();
