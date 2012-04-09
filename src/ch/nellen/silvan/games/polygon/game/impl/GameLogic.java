@@ -164,10 +164,11 @@ public class GameLogic implements IUpdatable, Observer {
 						.signum(Math.random() - 0.5));
 			}
 
-			updateMaxRadius(timeElapsed);
+			if (!cameraMoving)
+				updateMaxRadius(timeElapsed);
 
 			PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
-			for (PolygonUnfilled p: mPolygonModels) {
+			for (PolygonUnfilled p : mPolygonModels) {
 				if (!cameraMoving) {
 					float r = p.getRadius() - shrinkSpeed * timeElapsed;
 					if (r + p.getWidth() < mScene.getCenterRadius()) {
@@ -218,11 +219,11 @@ public class GameLogic implements IUpdatable, Observer {
 		if (phaseUpdate.newPhase == GameState.Phase.RUNNING) {
 			mScene.getPlayerModel().isVisible(true);
 			if (phaseUpdate.oldPhase == GameState.Phase.START) {
-				polyAdv.reset();
 				// New game started, init polygons
+				polyAdv.reset();
 				mMaxRadius = mMaxVisibleRadius;
 				PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
-				for (PolygonUnfilled p: mPolygonModels) {
+				for (PolygonUnfilled p : mPolygonModels) {
 					p.isVisible(true);
 					polyAdv.configureNextPolygon(p, mMaxVisibleRadius,
 							mMaxRadius);
@@ -232,7 +233,7 @@ public class GameLogic implements IUpdatable, Observer {
 		} else if (phaseUpdate.newPhase == GameState.Phase.START) {
 			mScene.getPlayerModel().isVisible(false);
 			PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
-			for (PolygonUnfilled p: mPolygonModels) {
+			for (PolygonUnfilled p : mPolygonModels) {
 				p.isVisible(false);
 			}
 			if (phaseUpdate.oldPhase == GameState.Phase.GAMEOVER) {

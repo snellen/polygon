@@ -22,8 +22,9 @@ public class PolygonAdversary {
 			setDefaultRadius(polygon, mMaxVisibleRadius, mMaxRadius);
 			currentConfig = getRandomConfig();
 		}
-		
-		void reset(){};
+
+		void reset() {
+		};
 	}
 
 	static Configurator[] configurators = new Configurator[] {
@@ -103,7 +104,7 @@ public class PolygonAdversary {
 					polygon.setWidth(relWidth * maxVisibleR);
 
 					phase++;
-					
+
 					if (phase == 5) {
 						currentConfig = getRandomConfig();
 						reset();
@@ -124,7 +125,7 @@ public class PolygonAdversary {
 					if (index < 0)
 						index += edgeEnabled.length;
 				}
-				
+
 				void reset() {
 					phase = 0;
 				}
@@ -142,10 +143,10 @@ public class PolygonAdversary {
 		configurators[currentConfig].configureNextPolygon(polygon,
 				mMaxVisibleRadius, mMaxRadius);
 	}
-	
+
 	void reset() {
-		for(int i = 0; i < configurators.length;++i)
-			configurators[i].reset();
+		for (Configurator c : configurators)
+			c.reset();
 	}
 
 	static private int getRandomConfig() {
