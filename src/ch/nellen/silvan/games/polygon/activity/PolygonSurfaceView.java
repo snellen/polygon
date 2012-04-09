@@ -31,4 +31,13 @@ public class PolygonSurfaceView extends GLSurfaceView {
 
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		
+		mRenderer.onPause();
+	}
+	
+	
+
 }

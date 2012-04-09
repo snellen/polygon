@@ -15,6 +15,7 @@ import android.opengl.GLU;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.MotionEvent;
+import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.impl.PlayerController;
 import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
@@ -107,6 +108,10 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 				});
 			}
 		}
+
+		public void onPause() {
+			mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+		}
 	}
 
 	public PolygonGame mGame = null;
@@ -121,6 +126,8 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		mGame = new PolygonGame(context);
 	}
 
+	
+	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		// Set the background frame color
 		gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -229,6 +236,11 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		// Update Game
 		mGame.onSurfaceChanged();
 	}
+	
+	public void onPause() {
+		mGame.onPause();
+	}
+	
 
 	@Override
 	public void registerRenderable3D(IRenderable r) {
