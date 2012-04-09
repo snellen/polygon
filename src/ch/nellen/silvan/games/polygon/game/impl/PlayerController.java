@@ -6,6 +6,7 @@ import java.util.Observer;
 import android.content.Context;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
+import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
@@ -38,7 +39,8 @@ public class PlayerController implements IInputHandler, Observer {
 	public boolean handleMotionEvent(float screenWidth, float screenHeight,
 			final MotionEvent event) {
 
-		if (mGameState.getAcceptInput()) {
+		if (mGameState.getAcceptInput()
+				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				mGameState.setPlayerAngularDir(0);
 			} else {
@@ -46,6 +48,8 @@ public class PlayerController implements IInputHandler, Observer {
 				// float glY = -(event.getY()-screenHeight/2);
 				mGameState.setPlayerAngularDir(glX < 0 ? 1 : -1);
 			}
+		} else {
+			mGameState.setPlayerAngularDir(0);
 		}
 
 		return true;
@@ -70,11 +74,11 @@ public class PlayerController implements IInputHandler, Observer {
 		}
 		mGameState.setPlayerAngularDir(0);
 	}
-	
+
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
-		int distTop = HeadsUpDisplay.MAX_WIDTH_FROM_TOP, distBorder = (int) (screenWidth*0.02);
+		int distTop = HeadsUpDisplay.MAX_WIDTH_FROM_TOP, distBorder = (int) (screenWidth * 0.02);
 		int keyWidth = screenWidth / 6;
-		int keyHeight = screenHeight-distTop;
+		int keyHeight = screenHeight - distTop;
 
 		leftKey.setX(distBorder);
 		leftKey.setY(distTop);
