@@ -9,8 +9,8 @@ public class CollisionDetection {
 	public boolean isPlayerCollided(Scene scene) {
 		PolygonUnfilled[] polygons = scene.getPolygonModels();
 		PlayerModel player = scene.getPlayerModel();
-		for (int i = 0; i < polygons.length; ++i) {
-			if (this.checkCollision(player, polygons[i]))
+		for (PolygonUnfilled p : polygons) {
+			if (this.checkCollision(player, p))
 				return true;
 		}
 		return false;
@@ -27,9 +27,11 @@ public class CollisionDetection {
 			float[] angles = new float[] { player.getAngle(),
 					player.getAngle() + tangAngle,
 					player.getAngle() - tangAngle };
-			for (int i = 0; i < radii.length; ++i) {
-				if (radii[i] > candidate.getRadius()
-						&& radii[i] < candidate.getRadius()
+			int i = 0;
+			float sectorAngle = (360 / IPolygonModel.NUMBER_OF_VERTICES);
+			for (float r: radii) {
+				if (r > candidate.getRadius()
+						&& r < candidate.getRadius()
 								+ candidate.getWidth()) {
 
 					float relativeAngle = angles[i] - candidate.getAngle();
@@ -39,7 +41,7 @@ public class CollisionDetection {
 					if (relativeAngle >= 360f) {
 						relativeAngle -= 360f;
 					}
-					int sector = (int) (relativeAngle / (360 / IPolygonModel.NUMBER_OF_VERTICES));
+					int sector = (int) (relativeAngle / sectorAngle);
 					if (sector < 0
 							|| sector >= IPolygonModel.NUMBER_OF_VERTICES)
 						return false; // Should not happen...
@@ -47,6 +49,7 @@ public class CollisionDetection {
 						return true;
 					}
 				}
+				i++;
 			}
 
 		}

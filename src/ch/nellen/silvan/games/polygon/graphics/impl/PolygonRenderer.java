@@ -148,8 +148,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glLoadIdentity();
 		GLU.gluLookAt(gl, 0, 0, mGame.getCameraZ(), 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 		mRenderContext.setGl(gl);
-		for (int i = 0; i < mRenderables3D.size(); ++i) {
-			IRenderable r = mRenderables3D.get(i);
+		for (IRenderable r: mRenderables3D) {
 			if (r.isVisible()) {
 				gl.glPushMatrix();
 				r.render(mRenderContext);
@@ -177,8 +176,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 		gl.glColor4f(1f, 1f, 1f, 1f);
 
-		for (int i = 0; i < mRenderables2D.size(); ++i) {
-			IRenderable r = mRenderables2D.get(i);
+		for (IRenderable r: mRenderables2D) {
 			if (r.isVisible()) {
 				gl.glPushMatrix();
 				r.render(mRenderContext);
