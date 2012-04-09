@@ -12,6 +12,7 @@ import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IInputHandler;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.ISprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
@@ -20,6 +21,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
 	private TextSprite totalTime;
+	private TextSprite fpsDisplay;
 	private ImageSprite logo;
 
 	GameState mGameState = null;
@@ -55,10 +57,20 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(textColor);
 		totalTime.setText("HIGHSCORE " + formatTime(mGameState.getHighscore()));
-		totalTime.setX(mScreenWidth - totalTime.getWidth());
 		totalTime.setPaddingHorizontal(5);
+		totalTime.setPaddingVertical(5);
 		rc.getRenderer().registerRenderable2D(totalTime);
 
+		fpsDisplay = new TextSprite();
+		fpsDisplay.setBackgroundColor(Color.TRANSPARENT);
+		fpsDisplay.setTextColor(textColor);
+		fpsDisplay.setPaddingHorizontal(5);
+		fpsDisplay.setPaddingVertical(5);
+		fpsDisplay.setText("FPS  0");
+		fpsDisplay.setTextSize(14);
+		fpsDisplay.isVisible(false);
+		rc.getRenderer().registerRenderable2D(fpsDisplay);
+		
 		pausedText = new TextSprite();
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
 		pausedText.setTextColor(textColor);
@@ -80,6 +92,11 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 	}
 
+	private boolean touchOn(float touchX, float touchY, ISprite s) {
+		return (touchX > s.getX() && touchX < s.getX() + s.getWidth()
+				&& touchY > s.getY() && touchY < s.getY() + s.getHeight());
+	}
+
 	@Override
 	public boolean handleMotionEvent(float screenWidth, float screenHeight,
 			MotionEvent event) {
@@ -90,13 +107,18 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && mGameState
 				.getAcceptInput());
 
-		if (pauseButton.isVisible() && evX > pauseButton.getX()
-				&& evX < pauseButton.getX() + pauseButton.getWidth()
-				&& evY > pauseButton.getY()
-				&& evY < pauseButton.getY() + pauseButton.getHeight()) {
+		if (pauseButton.isVisible() && touchOn(evX, evY, pauseButton)) {
 			if (inputValid)
 				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
 			return true; // Event handled
+		}
+
+		if (touchOn(evX, evY, fpsDisplay)) {
+			if (inputValid) {
+				lastFpsMeasure = 0;
+				frames = 0;
+				fpsDisplay.isVisible(!fpsDisplay.isVisible());
+			}
 		}
 
 		if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
@@ -115,10 +137,25 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		return false;
 	}
 
+	static long lastFpsMeasure = 0;//ms
+	static int frames = 0;
 	@Override
 	public void update(long timeElapsed) {
+		
 		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
 			updateTimeDisplay();
+		}
+		
+		if(fpsDisplay.isVisible()) {
+			lastFpsMeasure += timeElapsed;
+			frames++;
+			if(frames >= 25) {
+				float fps = ((float)frames*1000)/lastFpsMeasure;
+				fpsDisplay.setText("FPS "+String.format("%02.2f", fps));
+				fpsDisplay.setX(mScreenWidth - fpsDisplay.getWidth());
+				lastFpsMeasure = 0;
+				frames = 0;
+			}
 		}
 	}
 
@@ -147,7 +184,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		logo.setHeight((int) (mScreenHeight * 0.3));
 		logo.setX((mScreenWidth - logo.getWidth()) / 2);
 		logo.setY((mScreenHeight - logo.getHeight()) / 2);
-		
+
 		totalTime.setTextSize(52 * screenHeight / 600);
 		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_BORDER);
 		totalTime.setY(10);
@@ -157,7 +194,10 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		pausedText.setY(logo.getY() + logo.getHeight() + 5);
 
 		pauseButton.setTextSize(52 * screenHeight / 600);
-		
+
+		fpsDisplay.setX(screenWidth - fpsDisplay.getWidth());
+		fpsDisplay.setY(screenHeight - fpsDisplay.getHeight());
+
 	}
 
 	@Override

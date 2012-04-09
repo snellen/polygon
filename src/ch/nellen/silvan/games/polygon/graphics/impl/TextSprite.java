@@ -122,7 +122,6 @@ public class TextSprite extends Sprite {
 
 			mBitmap.eraseColor(Color.TRANSPARENT);
 			canvas.drawRect(0, 0, getWidth(), getHeight(), mBackgroundPaint);
-			canvas.drawRect(0, 0, getWidth(), getHeight(), mBackgroundPaint);
 			FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 			canvas.drawText(mText, mPaddingH, Math.abs(fontMetrics.ascent)
 					+ mPaddingV, mTextPaint);
