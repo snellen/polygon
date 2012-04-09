@@ -18,6 +18,8 @@ import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
 public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
+	public static int MAX_WIDTH_FROM_TOP = 90;
+	
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
 	private TextSprite totalTime;
@@ -28,8 +30,8 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	private int mScreenWidth;
 	private int mScreenHeight;
 
-	private static final int DIST_FROM_BORDER = 20;
-	private static final int DIST_FROM_TOP = 10;
+	private static int DIST_FROM_SIDE = 20;
+	private static int DIST_FROM_TOP = 10;
 
 	public HeadsUpDisplay(Context context, IRenderContext rc,
 			GameState gameState) {
@@ -45,8 +47,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		pauseButton = new TextSprite();
 		pauseButton.setBackgroundColor(background);
 		pauseButton.setTextColor(textColor);
-		pauseButton.setX(DIST_FROM_BORDER);
-		pauseButton.setY(DIST_FROM_TOP);
 		pauseButton.setText("PAUSE");
 		pauseButton.setPaddingHorizontal(15);
 		pauseButton.setPaddingVertical(10);
@@ -78,8 +78,6 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		rc.getRenderer().registerRenderable2D(pausedText);
 
 		logo = new ImageSprite(context.getResources(), R.drawable.logo);
-		logo.setX(0);
-		logo.setY(0);
 		rc.getRenderer().registerRenderable2D(logo);
 
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
@@ -168,7 +166,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 	private void setTimeText(String txt) {
 		totalTime.setText(txt);
-		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_BORDER);
+		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_SIDE);
 	}
 
 	String formatTime(long time) {
@@ -179,24 +177,30 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
 		mScreenWidth = screenWidth;
 		mScreenHeight = screenHeight;
+		
+		MAX_WIDTH_FROM_TOP = mScreenHeight/8;
+		DIST_FROM_SIDE = mScreenWidth/50;
+		DIST_FROM_TOP =  mScreenHeight/100;
 
 		logo.setWidth((int) (mScreenWidth));
 		logo.setHeight((int) (mScreenHeight * 0.3));
 		logo.setX((mScreenWidth - logo.getWidth()) / 2);
 		logo.setY((mScreenHeight - logo.getHeight()) / 2);
 
-		totalTime.setTextSize(52 * screenHeight / 600);
-		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_BORDER);
-		totalTime.setY(10);
+		totalTime.setTextSize(52 * mScreenHeight / 600);
+		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_SIDE);
+		totalTime.setY(Math.min(MAX_WIDTH_FROM_TOP-totalTime.getHeight(), DIST_FROM_TOP));
 
-		pausedText.setTextSize(78 * screenHeight / 600);
+		pausedText.setTextSize(78 * mScreenHeight / 600);
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY() + logo.getHeight() + 5);
 
-		pauseButton.setTextSize(52 * screenHeight / 600);
+		pauseButton.setTextSize(52 * mScreenHeight / 600);
+		pauseButton.setX(DIST_FROM_SIDE);
+		pauseButton.setY(Math.min(MAX_WIDTH_FROM_TOP-pauseButton.getHeight(), DIST_FROM_TOP));
 
-		fpsDisplay.setX(screenWidth - fpsDisplay.getWidth());
-		fpsDisplay.setY(screenHeight - fpsDisplay.getHeight());
+		fpsDisplay.setX(mScreenWidth - fpsDisplay.getWidth());
+		fpsDisplay.setY(mScreenHeight - fpsDisplay.getHeight());
 
 	}
 

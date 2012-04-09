@@ -14,8 +14,8 @@ public class PlayerModel extends Renderable {
 	private float mAngle;
 	private RGBAColor mColor = null;
 	
-	private final float SIZE = 0.06f;
-    private float triangleCoords[] = {
+	private static float SIZE = 0.06f;
+    private static float triangleCoords[] = {
             // X, Y, Z
     		SIZE, 0, 0,
             -SIZE/2, SIZE*0.866025404f, 0,
@@ -72,6 +72,15 @@ public class PlayerModel extends Renderable {
 
 	public float getSize() {
 		return SIZE;
+	}
+	
+	public void setSize(float size) {
+		SIZE = size;
+		triangleCoords[0] = SIZE;
+		triangleCoords[3] = -SIZE/2;
+		triangleCoords[4] = SIZE*0.866025404f;
+		triangleCoords[6] = -SIZE/2;
+		triangleCoords[7] = -SIZE*0.866025404f;
 	}
 	
 	public float getTangentialSize() {

@@ -10,13 +10,13 @@ import ch.nellen.silvan.games.polygon.game.IInputHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 
-public class GameController implements IInputHandler, Observer {
+public class PlayerController implements IInputHandler, Observer {
 	private GameState mGameState;
 
 	private ImageSprite leftKey;
 	private ImageSprite rightKey;
 
-	public GameController(Context context, IRenderContext rc, GameState gs) {
+	public PlayerController(Context context, IRenderContext rc, GameState gs) {
 		super();
 		mGameState = gs;
 		mGameState.addObserver(this);
@@ -72,16 +72,18 @@ public class GameController implements IInputHandler, Observer {
 	}
 	
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
-		int distTop = 90, distBorder = 5;
+		int distTop = HeadsUpDisplay.MAX_WIDTH_FROM_TOP, distBorder = (int) (screenWidth*0.02);
+		int keyWidth = screenWidth / 6;
+		int keyHeight = screenHeight-distTop;
 
 		leftKey.setX(distBorder);
 		leftKey.setY(distTop);
-		leftKey.setHeight(screenHeight - 2 * distTop);
-		leftKey.setWidth(screenWidth / 6);
+		leftKey.setHeight(keyHeight);
+		leftKey.setWidth(keyWidth);
 
-		rightKey.setX(screenWidth - distBorder - screenWidth / 6);
+		rightKey.setX(screenWidth - distBorder - keyWidth);
 		rightKey.setY(distTop);
-		rightKey.setWidth(screenWidth / 6);
-		rightKey.setHeight(screenHeight - 2 * distTop);
+		rightKey.setWidth(keyWidth);
+		rightKey.setHeight(keyHeight);
 	}
 }

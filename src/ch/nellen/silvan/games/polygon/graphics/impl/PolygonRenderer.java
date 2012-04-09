@@ -16,7 +16,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
-import ch.nellen.silvan.games.polygon.game.impl.GameController;
+import ch.nellen.silvan.games.polygon.game.impl.PlayerController;
 import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
 import ch.nellen.silvan.games.polygon.game.impl.GameState;
 import ch.nellen.silvan.games.polygon.game.impl.HeadsUpDisplay;
@@ -45,7 +45,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 		private GameLogic mGameLogic = null;
 		private Scene mScene = null;
-		private GameController mGameController = null;
+		private PlayerController mGameController = null;
 		private HeadsUpDisplay mHud = null;
 		private GameState mGameState = null;
 
@@ -60,7 +60,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 			mScene = new Scene(mRenderContext);
 			mHud = new HeadsUpDisplay(context, mRenderContext,
 					mGameState);
-			mGameController = new GameController(context, mRenderContext,
+			mGameController = new PlayerController(context, mRenderContext,
 					mGameState);
 			mGameLogic = new GameLogic(mScene, mGameState);
 			mHandler = new Handler();
@@ -77,8 +77,8 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		}
 
 		public void onSurfaceChanged() {
-			mGameController.onSurfaceChanged(mScreenWidth, mScreenHeight);
 			mHud.onSurfaceChanged(mScreenWidth, mScreenHeight);
+			mGameController.onSurfaceChanged(mScreenWidth, mScreenHeight);
 			float ratio = (float) mScreenWidth / mScreenHeight;
 			mGameLogic.onSurfaceChanged(mScreenWidth, mScreenHeight,
 					(float) (Math.sqrt(ratio * ratio + 1) / Z_NEAR));

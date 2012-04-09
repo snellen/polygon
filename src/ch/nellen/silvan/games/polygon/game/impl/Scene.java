@@ -64,6 +64,7 @@ public class Scene {
 
 		mPlayerModel
 				.setRadius((float) (CENTER_RADIUS + CENTER_WIDTH + mMaxVisibleRadius * 0.01));
+		mPlayerModel.setSize((float) (0.01*mMaxVisibleRadius));
 		mCenterPolygonBorder.setRadius(CENTER_RADIUS + CENTER_WIDTH);
 		mCenterPolygon.setRadius(CENTER_RADIUS);
 	}
