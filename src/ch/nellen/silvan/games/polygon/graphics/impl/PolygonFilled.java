@@ -5,6 +5,8 @@ import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
 public class PolygonFilled extends PolygonModel {
@@ -57,6 +59,11 @@ public class PolygonFilled extends PolygonModel {
 	@Override
 	public int indicesBufferRequirement() {
 		return NUMBER_OF_VERTICES*3;/* 3 vertices per triangle */
+	}
+	
+	@Override
+	public void init(Context context) {
+		// nothing to do
 	}
 
 }

@@ -1,6 +1,6 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
-import android.content.res.Resources;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -9,12 +9,11 @@ public class ImageSprite extends Sprite {
 	private int mHeight = 0;
 	private int mWidth = 0;
 	private Bitmap mBitmap = null;
+	private int mResourceId = -1;
 
-	public ImageSprite(Resources resource, int id) {
-		//Get the texture from the Android resource directory
-    	mBitmap = BitmapFactory.decodeResource(resource, id);
-		mHeight = mBitmap.getHeight();
-		mWidth = mBitmap.getWidth();
+	public ImageSprite(int id) {
+		super();
+		mResourceId = id;
 	}
 
 	// Overrides height and width
@@ -60,6 +59,12 @@ public class ImageSprite extends Sprite {
 	@Override
 	protected int getHeightOnScreen() {
 		return mHeight;
+	}
+
+	@Override
+	public void init(Context context) {
+		// Get the texture from the Android resource directory
+    	mBitmap = BitmapFactory.decodeResource(context.getResources(), mResourceId);
 	}
 
 }

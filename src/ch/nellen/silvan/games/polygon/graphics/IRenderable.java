@@ -1,6 +1,12 @@
 package ch.nellen.silvan.games.polygon.graphics;
 
+import android.content.Context;
+
 public interface IRenderable {
+
+	// Initialize, load resources etc.
+	// Called right before the first render pass
+	public abstract void init(Context context);
 
 	public abstract void render(IRenderContext gl);
 

@@ -1,5 +1,6 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -104,20 +105,9 @@ public class TextSprite extends Sprite {
 
 	Bitmap getTexture() {
 		if (mRefresh) {
-			int width = getWidth();
-			int height = getHeight();
-
-			if (canvas == null || mBitmap == null
-					|| mBitmap.getHeight() < height
-					|| mBitmap.getWidth() < width) {
-				// Allocate a power-of-two texture for best compatibility
-				int dim = (int) Math.pow(
-						2,
-						Math.ceil(Math.log(Math.max(width, height))
-								/ Math.log(2)));
-				mBitmap = Bitmap
-						.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
-				canvas = new Canvas(mBitmap);
+			if (mBitmap.getHeight() < getHeight()
+					|| mBitmap.getWidth() < getWidth()) {
+				createNewBitmap();
 			}
 
 			mBitmap.eraseColor(Color.TRANSPARENT);
@@ -125,9 +115,18 @@ public class TextSprite extends Sprite {
 			FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 			canvas.drawText(mText, mPaddingH, Math.abs(fontMetrics.ascent)
 					+ mPaddingV, mTextPaint);
-
 		}
 		return mBitmap;
+	}
+
+	private void createNewBitmap() {
+		// Allocate a power-of-two texture for best compatibility
+		int dim = (int) Math.pow(
+				2,
+				Math.ceil(Math.log(Math.max(getWidth(), getHeight()))
+						/ Math.log(2)));
+		mBitmap = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
+		canvas = new Canvas(mBitmap);
 	}
 
 	/*
@@ -171,5 +170,10 @@ public class TextSprite extends Sprite {
 			mTextPaint.setTypeface(tf);
 			onTextChanged();
 		}
+	}
+
+	@Override
+	public void init(Context context) {
+		createNewBitmap();
 	}
 }

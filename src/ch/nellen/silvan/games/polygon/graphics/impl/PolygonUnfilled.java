@@ -5,6 +5,8 @@ import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
 public class PolygonUnfilled extends PolygonModel {
@@ -95,6 +97,11 @@ public class PolygonUnfilled extends PolygonModel {
 	@Override
 	public int indicesBufferRequirement() {
 		return NUMBER_OF_VERTICES * 6;
+	}
+	
+	@Override
+	public void init(Context context) {
+		// nothing to do
 	}
 
 }

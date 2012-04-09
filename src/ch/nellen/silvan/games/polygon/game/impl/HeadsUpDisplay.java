@@ -77,7 +77,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		pausedText.setText("TAP TO START");
 		rc.getRenderer().registerRenderable2D(pausedText);
 
-		logo = new ImageSprite(context.getResources(), R.drawable.logo);
+		logo = new ImageSprite(R.drawable.logo);
 		rc.getRenderer().registerRenderable2D(logo);
 
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),

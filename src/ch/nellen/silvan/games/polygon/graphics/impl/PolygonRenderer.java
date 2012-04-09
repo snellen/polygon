@@ -31,17 +31,18 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private Vector<IRenderable> mRenderables3D = new Vector<IRenderable>(16);
 	private Vector<IRenderable> mRenderables2D = new Vector<IRenderable>(16);
 	long lastUpdate = 0;
+	private boolean mInitialized = false;
 	private int mScreenWidth;
 	private int mScreenHeight;
 	private static final float Z_NEAR = 2;
 
 	public static final String PREFERENCES = PolygonGame.class.getName();
 	public static final String PREFERENCES_BEST = "POLYGONBESTTIME";
+	private Context mContext;
 
 	// To keep all game specific code in one place...
 	public class PolygonGame implements IUpdatable, Observer {
 		private Handler mHandler = null;
-		private Context mContext;
 
 		private GameLogic mGameLogic = null;
 		private Scene mScene = null;
@@ -51,17 +52,14 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 		public PolygonGame(Context context) {
 			mGameState = new GameState();
-			mContext = context;
 			SharedPreferences prefs = mContext.getSharedPreferences(
 					PolygonRenderer.PREFERENCES, 0/* MODE_PRIVATE */);
 			mGameState.setHighscore(prefs.getLong(PREFERENCES_BEST, 0));
 			mGameState.addObserver(this);
-			
+
 			mScene = new Scene(mRenderContext);
-			mHud = new HeadsUpDisplay(context, mRenderContext,
-					mGameState);
-			mGameController = new PlayerController(context, mRenderContext,
-					mGameState);
+			mHud = new HeadsUpDisplay(context, mRenderContext, mGameState);
+			mGameController = new PlayerController(mRenderContext, mGameState);
 			mGameLogic = new GameLogic(mScene, mGameState);
 			mHandler = new Handler();
 		}
@@ -118,6 +116,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	}
 
 	public void init(Context context) {
+		mContext = context;
 		mRenderContext = new RenderContext(this);
 		mGame = new PolygonGame(context);
 	}
@@ -132,6 +131,17 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	}
 
 	public void onDrawFrame(GL10 gl) {
+
+		if (!mInitialized) {
+			for (IRenderable r : mRenderables3D) {
+				r.init(mContext);
+			}
+			for (IRenderable r : mRenderables2D) {
+				r.init(mContext);
+			}
+			mInitialized = true;
+		}
+
 		// Update game
 		long currTime = SystemClock.uptimeMillis();
 		long timeElapsed = 0;
@@ -148,7 +158,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glLoadIdentity();
 		GLU.gluLookAt(gl, 0, 0, mGame.getCameraZ(), 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 		mRenderContext.setGl(gl);
-		for (IRenderable r: mRenderables3D) {
+		for (IRenderable r : mRenderables3D) {
 			if (r.isVisible()) {
 				gl.glPushMatrix();
 				r.render(mRenderContext);
@@ -176,7 +186,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 		gl.glColor4f(1f, 1f, 1f, 1f);
 
-		for (IRenderable r: mRenderables2D) {
+		for (IRenderable r : mRenderables2D) {
 			if (r.isVisible()) {
 				gl.glPushMatrix();
 				r.render(mRenderContext);
