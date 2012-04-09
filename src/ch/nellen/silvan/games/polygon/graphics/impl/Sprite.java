@@ -91,6 +91,13 @@ public abstract class Sprite extends Renderable implements ISprite {
 		return 0;
 	}
 
+	
+	@Override
+	public void onTextureCleared() {
+		mRefresh = true;
+		mTextureId[0] = -1;
+	}
+
 	@Override
 	public void render(IRenderContext rc) {
 		GL10 gl = rc.getGl();

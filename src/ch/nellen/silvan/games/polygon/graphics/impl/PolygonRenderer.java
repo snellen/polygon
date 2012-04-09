@@ -128,6 +128,15 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		// Enable use of vertex arrays
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
+		
+		for (IRenderable r : mRenderables3D) {
+			r.onTextureCleared();
+		}
+		for (IRenderable r : mRenderables2D) {
+			r.onTextureCleared();
+		}
+		
+		
 	}
 
 	public void onDrawFrame(GL10 gl) {

@@ -133,4 +133,11 @@ public class PlayerModel extends Renderable {
 	public void init(Context context) {
 		// nothing to do
 	}
+
+	@Override
+	public void onTextureCleared() {
+		// nothing to do
+	}
+	
+	
 }

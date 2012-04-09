@@ -1,5 +1,6 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
+import android.content.Context;
 import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 
@@ -109,5 +110,16 @@ public abstract class PolygonModel extends Renderable implements IRenderable,
 	public RGBAColor getColor() {
 		return mColor;
 	}
+	
+	@Override
+	public void init(Context context) {
+		// nothing to do
+	}
+
+	@Override
+	public void onTextureCleared() {
+		// nothing to do
+	}
+	
 
 }
