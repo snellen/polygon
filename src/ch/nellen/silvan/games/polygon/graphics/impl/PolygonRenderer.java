@@ -110,7 +110,8 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		}
 
 		public void onPause() {
-			mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+			if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING)
+				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
 		}
 	}
 
@@ -126,8 +127,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		mGame = new PolygonGame(context);
 	}
 
-	
-	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		// Set the background frame color
 		gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -135,15 +134,14 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		// Enable use of vertex arrays
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
-		
+
 		for (IRenderable r : mRenderables3D) {
 			r.onTextureCleared();
 		}
 		for (IRenderable r : mRenderables2D) {
 			r.onTextureCleared();
 		}
-		
-		
+
 	}
 
 	public void onDrawFrame(GL10 gl) {
@@ -236,11 +234,10 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		// Update Game
 		mGame.onSurfaceChanged();
 	}
-	
+
 	public void onPause() {
 		mGame.onPause();
 	}
-	
 
 	@Override
 	public void registerRenderable3D(IRenderable r) {

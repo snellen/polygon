@@ -24,6 +24,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 	private TextSprite pausedText;
 	private TextSprite totalTime;
 	private TextSprite fpsDisplay;
+	private ImageSprite mCredits;
 	private ImageSprite logo;
 
 	GameState mGameState = null;
@@ -79,6 +80,9 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 
 		logo = new ImageSprite(R.drawable.logo);
 		rc.getRenderer().registerRenderable2D(logo);
+		
+		mCredits = new ImageSprite(R.drawable.credits);
+		rc.getRenderer().registerRenderable2D(mCredits);
 
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
 				"It_wasn_t_me.ttf");
@@ -203,6 +207,12 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY() + logo.getHeight() + 5);
 
+		int dim = (int) (mScreenWidth*((float)9)/10);
+		mCredits.setWidth(dim);
+		mCredits.setHeight(dim);
+		mCredits.setX((mScreenWidth - mCredits.getWidth()) / 2);
+		mCredits.setY((int) (mScreenHeight-((float)21)/256*dim));
+		
 		pauseButton.setTextSize(52 * mScreenHeight / 600);
 		pauseButton.setX(DIST_FROM_SIDE);
 		pauseButton.setY(Math.min(MAX_WIDTH_FROM_TOP - pauseButton.getHeight(),
@@ -225,6 +235,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			startTimer = 250;
 			logo.isVisible(true);
 			pausedText.isVisible(true);
+			mCredits.isVisible(true);
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
@@ -232,11 +243,13 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			break;
 		case RUNNING:
 			logo.isVisible(false);
+			mCredits.isVisible(false);
 			pausedText.isVisible(false);
 			pauseButton.isVisible(true);
 			break;
 		case PAUSED:
 			logo.isVisible(true);
+			mCredits.isVisible(false);
 			pausedText.isVisible(true);
 			pausedText.setText("PAUSED, TAP TO CONTINUE");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
@@ -244,6 +257,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 			break;
 		case GAMEOVER:
 			logo.isVisible(true);
+			mCredits.isVisible(false);
 			pausedText.isVisible(true);
 			pausedText.setText("GAME OVER, TAP TO RETRY");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
