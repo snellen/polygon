@@ -17,17 +17,23 @@ import android.os.SystemClock;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
-import ch.nellen.silvan.games.polygon.game.impl.PlayerController;
 import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
 import ch.nellen.silvan.games.polygon.game.impl.GameState;
 import ch.nellen.silvan.games.polygon.game.impl.HeadsUpDisplay;
-import ch.nellen.silvan.games.polygon.game.impl.Scene;
+import ch.nellen.silvan.games.polygon.game.impl.PlayerController;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
 public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
+	private static PolygonRenderer instance = null;
+	public static PolygonRenderer instance() {
+		if(instance == null)
+			instance = new PolygonRenderer();
+		return instance;
+	}
+	
 	private IRenderContext mRenderContext = null;
 	private Vector<IRenderable> mRenderables3D = new Vector<IRenderable>(16);
 	private Vector<IRenderable> mRenderables2D = new Vector<IRenderable>(16);
@@ -36,6 +42,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	private int mScreenWidth;
 	private int mScreenHeight;
 	private static final float Z_NEAR = 2;
+	private float mScreenRadiusZNearRatio;
 
 	public static final String PREFERENCES = PolygonGame.class.getName();
 	public static final String PREFERENCES_BEST = "POLYGONBESTTIME";
@@ -46,27 +53,23 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		private Handler mHandler = null;
 
 		private GameLogic mGameLogic = null;
-		private Scene mScene = null;
 		private PlayerController mGameController = null;
 		private HeadsUpDisplay mHud = null;
-		private GameState mGameState = null;
 
 		public PolygonGame(Context context) {
-			mGameState = new GameState();
 			SharedPreferences prefs = mContext.getSharedPreferences(
 					PolygonRenderer.PREFERENCES, 0/* MODE_PRIVATE */);
-			mGameState.setHighscore(prefs.getLong(PREFERENCES_BEST, 0));
-			mGameState.addObserver(this);
+			GameState.instance().setHighscore(prefs.getLong(PREFERENCES_BEST, 0));
+			GameState.instance().addObserver(this);
 
-			mScene = new Scene(mRenderContext);
-			mHud = new HeadsUpDisplay(context, mRenderContext, mGameState);
-			mGameController = new PlayerController(mRenderContext, mGameState);
-			mGameLogic = new GameLogic(mScene, mGameState);
+			mHud = new HeadsUpDisplay(context);
+			mGameController = new PlayerController();
+			mGameLogic = new GameLogic();
 			mHandler = new Handler();
 		}
 
 		public float getCameraZ() {
-			return mGameState.getCameraZ();
+			return GameState.instance().getCameraZ();
 		}
 
 		@Override
@@ -78,9 +81,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		public void onSurfaceChanged() {
 			mHud.onSurfaceChanged(mScreenWidth, mScreenHeight);
 			mGameController.onSurfaceChanged(mScreenWidth, mScreenHeight);
-			float ratio = (float) mScreenWidth / mScreenHeight;
-			mGameLogic.onSurfaceChanged(mScreenWidth, mScreenHeight,
-					(float) (Math.sqrt(ratio * ratio + 1) / Z_NEAR));
+			mGameLogic.onSurfaceChanged(mScreenWidth, mScreenHeight);
 		}
 
 		public void handleTouchEvent(float screenWidth, float screenHeight,
@@ -110,14 +111,14 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		}
 
 		public void onPause() {
-			if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING)
-				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+			if (GameState.instance().getCurrentPhase() == GameState.Phase.RUNNING)
+				GameState.instance().setCurrentPhase(IGameState.Phase.PAUSED);
 		}
 	}
 
 	public PolygonGame mGame = null;
 
-	public PolygonRenderer() {
+	private PolygonRenderer() {
 		super();
 	}
 
@@ -231,6 +232,8 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glFrustumf(-ratio, ratio, -1, 1, Z_NEAR, 7); // apply the projection
 		// matrix
 
+		mScreenRadiusZNearRatio = (float) (Math.sqrt(ratio * ratio + 1) / Z_NEAR);
+		
 		// Update Game
 		mGame.onSurfaceChanged();
 	}
@@ -264,4 +267,10 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		if (mRenderables2D.contains(r))
 			mRenderables2D.remove(r);
 	}
+
+	public float getScreenRadiusZNearRatio() {
+		return mScreenRadiusZNearRatio;
+	}
+	
+	
 }

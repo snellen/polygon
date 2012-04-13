@@ -8,6 +8,7 @@ import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonModel;
+import ch.nellen.silvan.games.polygon.graphics.impl.PolygonRenderer;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
 import ch.nellen.silvan.games.polygon.graphics.impl.RGBAColor;
 
@@ -23,32 +24,28 @@ public class GameLogic implements IUpdatable, Observer {
 	private static final float CAM_SPEED = 4f / 1000;
 
 	private static final float PLAYERSPEED = 0.55f;
+	private float shrinkSpeed = 2.2f / 1000;
+	private float rotationSpeed = 0.08f;
 
 	private float mMaxVisibleRadius;
 	private float mMaxRadius = 0;
 	private float mAngle = 0f;
 	private RGBAColor mColor = new RGBAColor(((float) 238) / 255,
 			((float) 244) / 255, 0, 1);
-	private float rotationSpeed = 0.08f;
-	private float shrinkSpeed = 2.2f / 1000;
 
 	private CollisionDetection collDec = null;
-	private Scene mScene = null;
-	private GameState mGameState = null;
 	private PolygonAdversary polyAdv = new PolygonAdversary();
 
-	public GameLogic(Scene scene, GameState gameState) {
+	public GameLogic() {
 		super();
 
 		collDec = new CollisionDetection();
-		mGameState = gameState;
-		mScene = scene;
-		mScene.getPlayerModel().isVisible(false);
+		GameState.getScene().getPlayerModel().isVisible(false);
 
-		mGameState.setCurrentPhase(IGameState.Phase.START);
-		mGameState.setCameraZ(PAUSE_CAM_POSITION);
+		GameState.instance().setCurrentPhase(IGameState.Phase.START);
+		GameState.instance().setCameraZ(PAUSE_CAM_POSITION);
 		InputHandler.acceptInput(true);
-		mGameState.addObserver((Observer) this);
+		GameState.instance().addObserver((Observer) this);
 	}
 
 	public float getShrinkSpeed() {
@@ -76,8 +73,8 @@ public class GameLogic implements IUpdatable, Observer {
 	}
 
 	private boolean moveCamera(long timeElapsed) {
-		float camPosition = mGameState.getCameraZ();
-		float targetPos = mGameState.getCurrentPhase() != IGameState.Phase.RUNNING ? PAUSE_CAM_POSITION
+		float camPosition = GameState.instance().getCameraZ();
+		float targetPos = GameState.instance().getCurrentPhase() != IGameState.Phase.RUNNING ? PAUSE_CAM_POSITION
 				: CAM_POSITION;
 		if (Math.abs(camPosition - targetPos) > 0.0001) {
 			// Move camera towards target position
@@ -93,7 +90,7 @@ public class GameLogic implements IUpdatable, Observer {
 			} else {
 				camPosition += dPosition;
 			}
-			mGameState.setCameraZ(camPosition);
+			GameState.instance().setCameraZ(camPosition);
 			return true;
 		}
 		return false;
@@ -133,32 +130,34 @@ public class GameLogic implements IUpdatable, Observer {
 
 	public void update(long timeElapsed) {
 
+		Scene theScene = GameState.getScene();
 		boolean cameraMoving = moveCamera(timeElapsed);
-		long totalTime = mGameState.getTimeElapsed();
+		GameState theGameState = GameState.instance();
+		long totalTime = theGameState.getTimeElapsed();
 		long interval = totalTime / CHANGEDIR_INTERVAL;
 
 		if (!cameraMoving
-				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
+				&& theGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			totalTime += timeElapsed;
-			mGameState.setTimeElapsed(totalTime);
+			theGameState.setTimeElapsed(totalTime);
 			updateColor(timeElapsed);
-			mScene.getCenterPolygonBorder().setColor(mColor);
+			theScene.getCenterPolygonBorder().setColor(mColor);
 		}
 
-		PlayerModel playerModel = mScene.getPlayerModel();
+		PlayerModel playerModel = theScene.getPlayerModel();
 		float playerAngle = playerModel.getAngle();
-		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING
-				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
+		if (theGameState.getCurrentPhase() == IGameState.Phase.RUNNING
+				|| theGameState.getCurrentPhase() == IGameState.Phase.START) {
 			updateAngle(timeElapsed);
 			// Rotate center
-			mScene.getCenterPolygonBorder().setAngle(mAngle);
-			mScene.getCenterPolygon().setAngle(mAngle);
+			theScene.getCenterPolygonBorder().setAngle(mAngle);
+			theScene.getCenterPolygon().setAngle(mAngle);
 			// Rotate player
 			playerAngle += rotationSpeed * timeElapsed;
 			playerModel.setAngle(playerAngle);
 		}
 
-		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
+		if (theGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 
 			if (interval != totalTime / CHANGEDIR_INTERVAL) {
 				rotationSpeed = (float) ((Math.random() * 0.08 + 0.08) * Math
@@ -168,11 +167,11 @@ public class GameLogic implements IUpdatable, Observer {
 			if (!cameraMoving)
 				updateMaxRadius(timeElapsed);
 
-			PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
+			PolygonUnfilled[] mPolygonModels = theScene.getPolygonModels();
 			for (PolygonUnfilled p : mPolygonModels) {
 				if (!cameraMoving) {
 					float r = p.getRadius() - shrinkSpeed * timeElapsed;
-					if (r + p.getWidth() < mScene.getCenterRadius()) {
+					if (r + p.getWidth() < theScene.getCenterRadius()) {
 						polyAdv.configureNextPolygon(p, mMaxVisibleRadius,
 								mMaxRadius);
 						mMaxRadius = p.getWidth() + p.getRadius();
@@ -184,14 +183,14 @@ public class GameLogic implements IUpdatable, Observer {
 				p.setAngle(mAngle);
 			}
 			// Update player
-			playerAngle += mGameState.getPlayerAngluarDir() * PLAYERSPEED
+			playerAngle += theGameState.getPlayerAngluarDir() * PLAYERSPEED
 					* timeElapsed;
 			playerModel.setAngle(playerAngle);
 
 			// Collision
-			if (collDec.isPlayerCollided(mScene)) {
-				mGameState.setHighscore(totalTime);
-				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
+			if (collDec.isPlayerCollided(theScene)) {
+				theGameState.setHighscore(totalTime);
+				theGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
 			}
 		}
 	}
@@ -201,13 +200,12 @@ public class GameLogic implements IUpdatable, Observer {
 				* timeElapsed);
 	}
 
-	public void onSurfaceChanged(int mScreenWidth, int mScreenHeight,
-			float screenRadiusZNearRatio) {
+	public void onSurfaceChanged(int mScreenWidth, int mScreenHeight) {
 
-		mMaxVisibleRadius = (float) (screenRadiusZNearRatio * CAM_POSITION / Math
+		mMaxVisibleRadius = (float) (PolygonRenderer.instance().getScreenRadiusZNearRatio() * CAM_POSITION / Math
 				.cos(Math.PI / PolygonModel.NUMBER_OF_VERTICES));
 
-		mScene.onMaxVisibleRadiusChanged(mMaxVisibleRadius);
+		GameState.getScene().onMaxVisibleRadiusChanged(mMaxVisibleRadius);
 	}
 
 	@Override
@@ -216,14 +214,16 @@ public class GameLogic implements IUpdatable, Observer {
 		if (arg1 == null)
 			return;
 
+		Scene theScene = GameState.getScene();
+		
 		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) arg1;
 		if (phaseUpdate.newPhase == GameState.Phase.RUNNING) {
-			mScene.getPlayerModel().isVisible(true);
+			theScene.getPlayerModel().isVisible(true);
 			if (phaseUpdate.oldPhase == GameState.Phase.START) {
 				// New game started, init polygons
 				polyAdv.reset();
 				mMaxRadius = mMaxVisibleRadius;
-				PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
+				PolygonUnfilled[] mPolygonModels = theScene.getPolygonModels();
 				for (PolygonUnfilled p : mPolygonModels) {
 					p.isVisible(true);
 					polyAdv.configureNextPolygon(p, mMaxVisibleRadius,
@@ -232,13 +232,13 @@ public class GameLogic implements IUpdatable, Observer {
 				}
 			}
 		} else if (phaseUpdate.newPhase == GameState.Phase.START) {
-			mScene.getPlayerModel().isVisible(false);
-			PolygonUnfilled[] mPolygonModels = mScene.getPolygonModels();
+			theScene.getPlayerModel().isVisible(false);
+			PolygonUnfilled[] mPolygonModels = theScene.getPolygonModels();
 			for (PolygonUnfilled p : mPolygonModels) {
 				p.isVisible(false);
 			}
 			if (phaseUpdate.oldPhase == GameState.Phase.GAMEOVER) {
-				mGameState.setTimeElapsed(0);
+				GameState.instance().setTimeElapsed(0);
 			}
 		}
 	}

@@ -9,9 +9,9 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 
 public class PolygonFilled extends PolygonModel {
 
-	public PolygonFilled(IRenderContext rc) {
+	public PolygonFilled() {
 		super();
-		rc.getRenderer().registerRenderable3D(this);
+		PolygonRenderer.instance().registerRenderable3D(this);
 	}
 
 	public void render(IRenderContext rc) {

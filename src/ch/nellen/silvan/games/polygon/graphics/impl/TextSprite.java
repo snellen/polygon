@@ -40,6 +40,8 @@ public class TextSprite extends Sprite {
 			cEraserPaint.setAlpha(0);
 			cEraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
 		}
+		
+		PolygonRenderer.instance().registerRenderable2D(this);
 	}
 
 	public void setText(String text) {

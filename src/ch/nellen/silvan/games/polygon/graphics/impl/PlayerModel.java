@@ -22,8 +22,8 @@ public class PlayerModel extends Renderable {
 			-SIZE * 0.866025404f, 0 };
 	private float mZCoord;
 
-	public PlayerModel(IRenderContext rc) {
-		rc.getRenderer().registerRenderable3D(this);
+	public PlayerModel() {
+		PolygonRenderer.instance().registerRenderable3D(this);
 		mColor = new RGBAColor(1f, 0f, 0f, 1f);
 		mZCoord = 0.0f;
 		mAngle = 0f;

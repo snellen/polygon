@@ -14,6 +14,7 @@ public class ImageSprite extends Sprite {
 	public ImageSprite(int id) {
 		super();
 		mResourceId = id;
+		PolygonRenderer.instance().registerRenderable2D(this);
 	}
 
 	// Overrides height and width

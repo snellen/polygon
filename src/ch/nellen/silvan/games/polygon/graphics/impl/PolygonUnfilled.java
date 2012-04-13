@@ -13,9 +13,9 @@ public class PolygonUnfilled extends PolygonModel {
 	private int numEdgesEnabled = NUMBER_OF_VERTICES;
 	private float mWidth = 0.5f;
 
-	public PolygonUnfilled(IRenderContext rc) {
+	public PolygonUnfilled() {
 		super();
-		rc.getRenderer().registerRenderable3D(this);
+		PolygonRenderer.instance().registerRenderable3D(this);
 	}
 
 	public void setWidth(float w) {

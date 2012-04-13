@@ -9,9 +9,8 @@ import android.graphics.Typeface;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
 import ch.nellen.silvan.games.polygon.game.IGameState;
-import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
-import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.ISprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
@@ -27,19 +26,16 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 	private ImageSprite mCredits;
 	private ImageSprite logo;
 
-	GameState mGameState = null;
 	private int mScreenWidth;
 	private int mScreenHeight;
 
 	private static int DIST_FROM_SIDE = 20;
 	private static int DIST_FROM_TOP = 10;
 
-	public HeadsUpDisplay(Context context, IRenderContext rc,
-			GameState gameState) {
+	public HeadsUpDisplay(Context context) {
 		super();
 
-		mGameState = gameState;
-		mGameState.addObserver(this);
+		GameState.instance().addObserver(this);
 
 		int background = Color.argb(128, (int) (0.3f * 255),
 				(int) (0.3f * 255), (int) (0.3f * 255));
@@ -52,15 +48,13 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		pauseButton.setPaddingHorizontal(15);
 		pauseButton.setPaddingVertical(10);
 		pauseButton.isVisible(false);
-		rc.getRenderer().registerRenderable2D(pauseButton);
 
 		totalTime = new TextSprite();
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(textColor);
-		totalTime.setText("HIGHSCORE " + formatTime(mGameState.getHighscore()));
+		totalTime.setText("HIGHSCORE " + formatTime(GameState.instance().getHighscore()));
 		totalTime.setPaddingHorizontal(5);
 		totalTime.setPaddingVertical(5);
-		rc.getRenderer().registerRenderable2D(totalTime);
 
 		fpsDisplay = new TextSprite();
 		fpsDisplay.setBackgroundColor(Color.TRANSPARENT);
@@ -70,19 +64,15 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		fpsDisplay.setText("FPS  0");
 		fpsDisplay.setTextSize(14);
 		fpsDisplay.isVisible(false);
-		rc.getRenderer().registerRenderable2D(fpsDisplay);
 
 		pausedText = new TextSprite();
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
 		pausedText.setTextColor(textColor);
 		pausedText.setText("TAP TO START");
-		rc.getRenderer().registerRenderable2D(pausedText);
 
 		logo = new ImageSprite(R.drawable.logo);
-		rc.getRenderer().registerRenderable2D(logo);
 		
 		mCredits = new ImageSprite(R.drawable.credits);
-		rc.getRenderer().registerRenderable2D(mCredits);
 
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
 				"It_wasn_t_me.ttf");
@@ -106,11 +96,12 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		float evX = event.getX();
 		float evY = event.getY();
 
+		GameState theGameState = GameState.instance();
 		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && acceptInput());
 
 		if (pauseButton.isVisible() && touchOn(evX, evY, pauseButton)) {
 			if (inputValid)
-				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+				theGameState.setCurrentPhase(IGameState.Phase.PAUSED);
 			return true; // Event handled
 		}
 
@@ -122,18 +113,18 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			}
 		}
 
-		if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
-				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
+		if (theGameState.getCurrentPhase() == IGameState.Phase.PAUSED
+				|| theGameState.getCurrentPhase() == IGameState.Phase.START) {
 			if (inputValid
-					&& (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED)
+					&& (theGameState.getCurrentPhase() == IGameState.Phase.PAUSED)
 					|| startTimer <= 0)
-				mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
+				theGameState.setCurrentPhase(IGameState.Phase.RUNNING);
 			return true;
 		}
 
-		if (mGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
+		if (theGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
 			if (inputValid)
-				mGameState.setCurrentPhase(IGameState.Phase.START);
+				theGameState.setCurrentPhase(IGameState.Phase.START);
 			return true;
 		}
 
@@ -150,7 +141,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		if (startTimer > 0)
 			startTimer -= timeElapsed;
 
-		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
+		if (GameState.instance().getCurrentPhase() == GameState.Phase.RUNNING) {
 			updateTimeDisplay();
 		}
 
@@ -169,7 +160,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 
 	private void updateTimeDisplay() {
 		String timeString;
-		long time = mGameState.getTimeElapsed();
+		long time = GameState.instance().getTimeElapsed();
 		timeString = "TIME " + formatTime(time);
 		setTimeText(timeString);
 	}
@@ -238,7 +229,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			setTimeText("HIGHSCORE " + formatTime(mGameState.getHighscore()));
+			setTimeText("HIGHSCORE " + formatTime(GameState.instance().getHighscore()));
 			break;
 		case RUNNING:
 			logo.isVisible(false);
