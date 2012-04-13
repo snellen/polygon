@@ -21,7 +21,7 @@ public class GameLogic implements IUpdatable, Observer {
 	private static final float CAM_POSITION = 5f;
 	private static final float CAM_SPEED = 4f / 1000;
 
-	private static final float PLAYERSPEED = 0.35f;
+	private static final float PLAYERSPEED = 0.55f;
 
 	private float mMaxVisibleRadius;
 	private float mMaxRadius = 0;
@@ -29,7 +29,7 @@ public class GameLogic implements IUpdatable, Observer {
 	private RGBAColor mColor = new RGBAColor(((float) 238) / 255,
 			((float) 244) / 255, 0, 1);
 	private float rotationSpeed = 0.08f;
-	private float shrinkSpeed = 1.5f / 1000;
+	private float shrinkSpeed = 2.2f / 1000;
 
 	private CollisionDetection collDec = null;
 	private Scene mScene = null;
@@ -160,7 +160,7 @@ public class GameLogic implements IUpdatable, Observer {
 		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 
 			if (interval != totalTime / CHANGEDIR_INTERVAL) {
-				rotationSpeed = (float) ((Math.random() * 0.08 + 0.04) * Math
+				rotationSpeed = (float) ((Math.random() * 0.08 + 0.08) * Math
 						.signum(Math.random() - 0.5));
 			}
 
