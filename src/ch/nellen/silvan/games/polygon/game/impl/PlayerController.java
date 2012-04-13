@@ -6,11 +6,11 @@ import java.util.Observer;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
 import ch.nellen.silvan.games.polygon.game.IGameState;
-import ch.nellen.silvan.games.polygon.game.IInputHandler;
+import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 
-public class PlayerController implements IInputHandler, Observer {
+public class PlayerController extends InputHandler implements Observer {
 	private GameState mGameState;
 
 	private ImageSprite leftKey;
@@ -38,7 +38,7 @@ public class PlayerController implements IInputHandler, Observer {
 	public boolean handleMotionEvent(float screenWidth, float screenHeight,
 			final MotionEvent event) {
 
-		if (mGameState.getAcceptInput()
+		if (acceptInput()
 				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				mGameState.setPlayerAngularDir(0);

@@ -26,9 +26,5 @@ public interface IGameState {
 	public abstract Phase getCurrentPhase();
 
 	public abstract void setCurrentPhase(Phase newPhase);
-	
-	public abstract void setAcceptInput(boolean mPauseState);
-
-	public abstract boolean getAcceptInput();
 
 }

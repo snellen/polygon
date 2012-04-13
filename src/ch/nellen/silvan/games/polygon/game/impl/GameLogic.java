@@ -5,6 +5,7 @@ import java.util.Observer;
 
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
+import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
@@ -46,7 +47,7 @@ public class GameLogic implements IUpdatable, Observer {
 
 		mGameState.setCurrentPhase(IGameState.Phase.START);
 		mGameState.setCameraZ(PAUSE_CAM_POSITION);
-		mGameState.setAcceptInput(true);
+		InputHandler.acceptInput(true);
 		mGameState.addObserver((Observer) this);
 	}
 
@@ -80,7 +81,7 @@ public class GameLogic implements IUpdatable, Observer {
 				: CAM_POSITION;
 		if (Math.abs(camPosition - targetPos) > 0.0001) {
 			// Move camera towards target position
-			mGameState.setAcceptInput(false);
+			InputHandler.acceptInput(false);
 			float dPosition = Math.signum(targetPos - camPosition) * CAM_SPEED
 					* timeElapsed;
 			if (Math.signum(targetPos - camPosition) != Math.signum(targetPos
@@ -88,7 +89,7 @@ public class GameLogic implements IUpdatable, Observer {
 					|| Math.abs(targetPos - camPosition - dPosition) < 0.001) { // Close
 																				// enough
 				camPosition = targetPos;
-				mGameState.setAcceptInput(true);
+				InputHandler.acceptInput(true);
 			} else {
 				camPosition += dPosition;
 			}

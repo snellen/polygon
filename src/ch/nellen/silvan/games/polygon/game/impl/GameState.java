@@ -14,7 +14,6 @@ public class GameState extends Observable implements IGameState {
 	private long mTimeElapsed;
 	private long mHighscore = 0;
 	private float mCameraZ;
-	private boolean mAcceptInput;
 	private Phase mCurrentPhase = Phase.START;
 
 	@Override
@@ -63,16 +62,6 @@ public class GameState extends Observable implements IGameState {
 	@Override
 	public float getCameraZ() {
 		return mCameraZ;
-	}
-
-	@Override
-	public void setAcceptInput(boolean flag) {
-		mAcceptInput = flag;
-	}
-
-	@Override
-	public boolean getAcceptInput() {
-		return mAcceptInput;
 	}
 
 	public long getHighscore() {

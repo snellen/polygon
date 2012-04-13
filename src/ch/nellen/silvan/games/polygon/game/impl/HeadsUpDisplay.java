@@ -9,14 +9,14 @@ import android.graphics.Typeface;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
 import ch.nellen.silvan.games.polygon.game.IGameState;
-import ch.nellen.silvan.games.polygon.game.IInputHandler;
+import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
 import ch.nellen.silvan.games.polygon.graphics.ISprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
-public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
+public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer {
 
 	public static int MAX_WIDTH_FROM_TOP = 90;
 
@@ -106,8 +106,7 @@ public class HeadsUpDisplay implements IInputHandler, IUpdatable, Observer {
 		float evX = event.getX();
 		float evY = event.getY();
 
-		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && mGameState
-				.getAcceptInput());
+		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && acceptInput());
 
 		if (pauseButton.isVisible() && touchOn(evX, evY, pauseButton)) {
 			if (inputValid)
