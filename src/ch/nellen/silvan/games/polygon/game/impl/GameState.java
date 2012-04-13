@@ -63,12 +63,12 @@ public class GameState extends Observable implements IGameState {
 	}
 
 	@Override
-	public void setTimeElapsed(long time) {
+	public void setTotalTime(long time) {
 		mTimeElapsed = time;
 	}
 
 	@Override
-	public long getTimeElapsed() {
+	public long getTotalTime() {
 		return mTimeElapsed;
 	}
 
@@ -82,11 +82,11 @@ public class GameState extends Observable implements IGameState {
 		return mCameraZ;
 	}
 
-	public long getHighscore() {
+	public long getCurrentHighscore() {
 		return mHighscore;
 	}
 
-	public void setHighscore(long highscore) {
+	public void updateHighscore(long highscore) {
 		if (mHighscore < highscore) {
 			mHighscore = highscore;
 			setChanged();

@@ -59,7 +59,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		public PolygonGame(Context context) {
 			SharedPreferences prefs = mContext.getSharedPreferences(
 					PolygonRenderer.PREFERENCES, 0/* MODE_PRIVATE */);
-			GameState.instance().setHighscore(prefs.getLong(PREFERENCES_BEST, 0));
+			GameState.instance().updateHighscore(prefs.getLong(PREFERENCES_BEST, 0));
 			GameState.instance().addObserver(this);
 
 			mHud = new HeadsUpDisplay(context);
@@ -95,7 +95,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		public void update(Observable arg0, Object arg1) {
 			if (arg1 == null) {
 				GameState gs = (GameState) arg0;
-				final long highscore = gs.getHighscore();
+				final long highscore = gs.getCurrentHighscore();
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {

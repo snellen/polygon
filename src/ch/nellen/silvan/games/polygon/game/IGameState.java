@@ -15,9 +15,9 @@ public interface IGameState {
 
 	public abstract int getPlayerAngluarDir();
 
-	public abstract void setTimeElapsed(long time);
+	public abstract void setTotalTime(long time);
 
-	public abstract long getTimeElapsed();
+	public abstract long getTotalTime();
 
 	public abstract void setCameraZ(float time);
 

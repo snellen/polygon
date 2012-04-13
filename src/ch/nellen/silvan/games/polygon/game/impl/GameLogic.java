@@ -24,8 +24,11 @@ public class GameLogic implements IUpdatable, Observer {
 	private static final float CAM_SPEED = 4f / 1000;
 
 	private static final float PLAYERSPEED = 0.55f;
+	private static float MAX_ROTATION_SPEED = 0.20f;
+	private static float MIN_ROTATION_SPEED = 0.10f;
+	
 	private float shrinkSpeed = 2.2f / 1000;
-	private float rotationSpeed = 0.08f;
+	private float rotationSpeed = MIN_ROTATION_SPEED;
 
 	private float mMaxVisibleRadius;
 	private float mMaxRadius = 0;
@@ -33,37 +36,18 @@ public class GameLogic implements IUpdatable, Observer {
 	private RGBAColor mColor = new RGBAColor(((float) 238) / 255,
 			((float) 244) / 255, 0, 1);
 
-	private CollisionDetection collDec = null;
+	private CollisionDetection collDec = new CollisionDetection();
 	private PolygonAdversary polyAdv = new PolygonAdversary();
 
 	public GameLogic() {
 		super();
-
-		collDec = new CollisionDetection();
+		
 		GameState.getScene().getPlayerModel().isVisible(false);
 
 		GameState.instance().setCurrentPhase(IGameState.Phase.START);
 		GameState.instance().setCameraZ(PAUSE_CAM_POSITION);
 		InputHandler.acceptInput(true);
 		GameState.instance().addObserver((Observer) this);
-	}
-
-	public float getShrinkSpeed() {
-		return shrinkSpeed;
-	}
-
-	public void setShrinkSpeed(float shrinkSpeed) {
-		this.shrinkSpeed = shrinkSpeed;
-	}
-
-	// Rotation speed degrees/millisecond
-	public float getRotationSpeed() {
-		return rotationSpeed;
-	}
-
-	// Rotation speed degrees/millisecond
-	public void setRotationSpeed(float rotationSpeed) {
-		this.rotationSpeed = rotationSpeed;
 	}
 
 	private void updateAngle(long timeElapsed) {
@@ -96,10 +80,10 @@ public class GameLogic implements IUpdatable, Observer {
 		return false;
 	}
 
-	private int targetIndex = 0;
-	private RGBAColor colorV = new RGBAColor(COLORS[targetIndex].r - mColor.r,
-			COLORS[targetIndex].g - mColor.g, COLORS[targetIndex].b - mColor.b,
-			COLORS[targetIndex].alpha - mColor.alpha);
+	private int targetColorIndex = 0;
+	private RGBAColor colorV = new RGBAColor(COLORS[targetColorIndex].r - mColor.r,
+			COLORS[targetColorIndex].g - mColor.g, COLORS[targetColorIndex].b - mColor.b,
+			COLORS[targetColorIndex].alpha - mColor.alpha);
 
 	private void updateColor(long timeElapsed) {
 		float dT = ((float) timeElapsed) / 1000;
@@ -107,20 +91,20 @@ public class GameLogic implements IUpdatable, Observer {
 		float dG = colorV.g * dT;
 		float dB = colorV.b * dT;
 
-		if (Math.signum(COLORS[targetIndex].r - mColor.r - dR) != Math
-				.signum(COLORS[targetIndex].r - mColor.r)
-				|| Math.signum(COLORS[targetIndex].g - mColor.g - dG) != Math
-						.signum(COLORS[targetIndex].g - mColor.g)
-				|| Math.signum(COLORS[targetIndex].b - mColor.b - dB) != Math
-						.signum(COLORS[targetIndex].b - mColor.b)) {
-			mColor.r = COLORS[targetIndex].r;
-			mColor.g = COLORS[targetIndex].g;
-			mColor.b = COLORS[targetIndex].b;
+		if (Math.signum(COLORS[targetColorIndex].r - mColor.r - dR) != Math
+				.signum(COLORS[targetColorIndex].r - mColor.r)
+				|| Math.signum(COLORS[targetColorIndex].g - mColor.g - dG) != Math
+						.signum(COLORS[targetColorIndex].g - mColor.g)
+				|| Math.signum(COLORS[targetColorIndex].b - mColor.b - dB) != Math
+						.signum(COLORS[targetColorIndex].b - mColor.b)) {
+			mColor.r = COLORS[targetColorIndex].r;
+			mColor.g = COLORS[targetColorIndex].g;
+			mColor.b = COLORS[targetColorIndex].b;
 
-			targetIndex = (targetIndex + 1) % COLORS.length;
-			colorV.r = COLORS[targetIndex].r - mColor.r;
-			colorV.g = COLORS[targetIndex].g - mColor.g;
-			colorV.b = COLORS[targetIndex].b - mColor.b;
+			targetColorIndex = (targetColorIndex + 1) % COLORS.length;
+			colorV.r = COLORS[targetColorIndex].r - mColor.r;
+			colorV.g = COLORS[targetColorIndex].g - mColor.g;
+			colorV.b = COLORS[targetColorIndex].b - mColor.b;
 		} else {
 			mColor.r += colorV.r * dT;
 			mColor.g += colorV.g * dT;
@@ -131,15 +115,16 @@ public class GameLogic implements IUpdatable, Observer {
 	public void update(long timeElapsed) {
 
 		Scene theScene = GameState.getScene();
-		boolean cameraMoving = moveCamera(timeElapsed);
 		GameState theGameState = GameState.instance();
-		long totalTime = theGameState.getTimeElapsed();
-		long interval = totalTime / CHANGEDIR_INTERVAL;
+		
+		boolean cameraMoving = moveCamera(timeElapsed);
+		long totalTime = theGameState.getTotalTime();
+		long changeDirInterval = totalTime / CHANGEDIR_INTERVAL;
 
 		if (!cameraMoving
 				&& theGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			totalTime += timeElapsed;
-			theGameState.setTimeElapsed(totalTime);
+			theGameState.setTotalTime(totalTime);
 			updateColor(timeElapsed);
 			theScene.getCenterPolygonBorder().setColor(mColor);
 		}
@@ -159,8 +144,8 @@ public class GameLogic implements IUpdatable, Observer {
 
 		if (theGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 
-			if (interval != totalTime / CHANGEDIR_INTERVAL) {
-				rotationSpeed = (float) ((Math.random() * 0.08 + 0.08) * Math
+			if (changeDirInterval != totalTime / CHANGEDIR_INTERVAL) {
+				rotationSpeed = (float) ((Math.random() * (MAX_ROTATION_SPEED-MIN_ROTATION_SPEED) + MIN_ROTATION_SPEED) * Math
 						.signum(Math.random() - 0.5));
 			}
 
@@ -189,7 +174,7 @@ public class GameLogic implements IUpdatable, Observer {
 
 			// Collision
 			if (collDec.isPlayerCollided(theScene)) {
-				theGameState.setHighscore(totalTime);
+				theGameState.updateHighscore(totalTime);
 				theGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
 			}
 		}
@@ -208,6 +193,7 @@ public class GameLogic implements IUpdatable, Observer {
 		GameState.getScene().onMaxVisibleRadiusChanged(mMaxVisibleRadius);
 	}
 
+	// Handle changes in GameState
 	@Override
 	public void update(Observable arg0, Object arg1) {
 
@@ -238,7 +224,7 @@ public class GameLogic implements IUpdatable, Observer {
 				p.isVisible(false);
 			}
 			if (phaseUpdate.oldPhase == GameState.Phase.GAMEOVER) {
-				GameState.instance().setTimeElapsed(0);
+				GameState.instance().setTotalTime(0);
 			}
 		}
 	}

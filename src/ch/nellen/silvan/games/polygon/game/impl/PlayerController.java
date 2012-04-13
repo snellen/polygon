@@ -50,6 +50,7 @@ public class PlayerController extends InputHandler implements Observer {
 		return true;
 	}
 
+	// Handle changes in GameState
 	@Override
 	public void update(Observable observable, Object data) {
 		if (data == null)

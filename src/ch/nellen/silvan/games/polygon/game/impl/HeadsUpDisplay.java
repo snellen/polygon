@@ -52,7 +52,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		totalTime = new TextSprite();
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(textColor);
-		totalTime.setText("HIGHSCORE " + formatTime(GameState.instance().getHighscore()));
+		totalTime.setText("HIGHSCORE " + formatTime(GameState.instance().getCurrentHighscore()));
 		totalTime.setPaddingHorizontal(5);
 		totalTime.setPaddingVertical(5);
 
@@ -160,7 +160,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 
 	private void updateTimeDisplay() {
 		String timeString;
-		long time = GameState.instance().getTimeElapsed();
+		long time = GameState.instance().getTotalTime();
 		timeString = "TIME " + formatTime(time);
 		setTimeText(timeString);
 	}
@@ -213,6 +213,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 
 	}
 
+	// Handle changes in GameState
 	@Override
 	public void update(Observable observable, Object data) {
 
@@ -229,7 +230,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			setTimeText("HIGHSCORE " + formatTime(GameState.instance().getHighscore()));
+			setTimeText("HIGHSCORE " + formatTime(GameState.instance().getCurrentHighscore()));
 			break;
 		case RUNNING:
 			logo.isVisible(false);
