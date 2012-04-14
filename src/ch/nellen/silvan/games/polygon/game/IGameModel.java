@@ -17,7 +17,7 @@
 */
 package ch.nellen.silvan.games.polygon.game;
 
-public interface IGameState {
+public interface IGameModel {
 
 	enum Phase {
 		START, RUNNING, PAUSED, GAMEOVER

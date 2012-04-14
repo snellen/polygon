@@ -20,7 +20,7 @@ package ch.nellen.silvan.games.polygon.game.impl;
 import java.util.Observable;
 import java.util.Observer;
 
-import ch.nellen.silvan.games.polygon.game.IGameState;
+import ch.nellen.silvan.games.polygon.game.IGameModel;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
@@ -29,7 +29,7 @@ import ch.nellen.silvan.games.polygon.graphics.impl.PolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
 import ch.nellen.silvan.games.polygon.graphics.impl.RGBAColor;
 
-public class GameLogic implements IUpdatable, Observer {
+public class GameController implements IUpdatable, Observer {
 
 	private static final long CHANGEDIR_INTERVAL = 10000; // ms
 	private static final RGBAColor[] COLORS = {
@@ -55,15 +55,15 @@ public class GameLogic implements IUpdatable, Observer {
 
 	private CollisionDetection collDec = new CollisionDetection();
 	private PolygonAdversary polyAdv = new PolygonAdversary();
-	private GameState mGameState;
+	private GameModel mGameState;
 
-	public GameLogic(GameState gameState) {
+	public GameController(GameModel gameState) {
 		super();
 		
 		mGameState = gameState;
 		gameState.getScene().getPlayerModel().isVisible(false);
 
-		gameState.setCurrentPhase(IGameState.Phase.START);
+		gameState.setCurrentPhase(IGameModel.Phase.START);
 		gameState.setCameraZ(PAUSE_CAM_POSITION);
 		InputHandler.acceptInput(true);
 		gameState.addObserver((Observer) this);
@@ -77,7 +77,7 @@ public class GameLogic implements IUpdatable, Observer {
 
 	private boolean moveCamera(long timeElapsed) {
 		float camPosition = mGameState.getCameraZ();
-		float targetPos = mGameState.getCurrentPhase() != IGameState.Phase.RUNNING ? PAUSE_CAM_POSITION
+		float targetPos = mGameState.getCurrentPhase() != IGameModel.Phase.RUNNING ? PAUSE_CAM_POSITION
 				: CAM_POSITION;
 		if (Math.abs(camPosition - targetPos) > 0.0001) {
 			// Move camera towards target position
@@ -140,7 +140,7 @@ public class GameLogic implements IUpdatable, Observer {
 		long changeDirInterval = totalTime / CHANGEDIR_INTERVAL;
 
 		if (!cameraMoving
-				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
+				&& mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 			totalTime += timeElapsed;
 			mGameState.setTotalTime(totalTime);
 			updateColor(timeElapsed);
@@ -149,8 +149,8 @@ public class GameLogic implements IUpdatable, Observer {
 
 		PlayerModel playerModel = theScene.getPlayerModel();
 		float playerAngle = playerModel.getAngle();
-		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING
-				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
+		if (mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING
+				|| mGameState.getCurrentPhase() == IGameModel.Phase.START) {
 			updateAngle(timeElapsed);
 			// Rotate center
 			theScene.getCenterPolygonBorder().setAngle(mAngle);
@@ -160,7 +160,7 @@ public class GameLogic implements IUpdatable, Observer {
 			playerModel.setAngle(playerAngle);
 		}
 
-		if (mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
+		if (mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 
 			if (changeDirInterval != totalTime / CHANGEDIR_INTERVAL) {
 				rotationSpeed = (float) ((Math.random() * (MAX_ROTATION_SPEED-MIN_ROTATION_SPEED) + MIN_ROTATION_SPEED) * Math
@@ -193,7 +193,7 @@ public class GameLogic implements IUpdatable, Observer {
 			// Collision
 			if (collDec.isPlayerCollided(theScene)) {
 				mGameState.updateHighscore(totalTime);
-				mGameState.setCurrentPhase(IGameState.Phase.GAMEOVER);
+				mGameState.setCurrentPhase(IGameModel.Phase.GAMEOVER);
 			}
 		}
 	}
@@ -220,10 +220,10 @@ public class GameLogic implements IUpdatable, Observer {
 
 		Scene theScene = mGameState.getScene();
 		
-		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) arg1;
-		if (phaseUpdate.newPhase == GameState.Phase.RUNNING) {
+		GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) arg1;
+		if (phaseUpdate.newPhase == GameModel.Phase.RUNNING) {
 			theScene.getPlayerModel().isVisible(true);
-			if (phaseUpdate.oldPhase == GameState.Phase.START) {
+			if (phaseUpdate.oldPhase == GameModel.Phase.START) {
 				// New game started, init polygons
 				polyAdv.reset();
 				mMaxRadius = mMaxVisibleRadius;
@@ -235,13 +235,13 @@ public class GameLogic implements IUpdatable, Observer {
 					mMaxRadius = p.getWidth() + p.getRadius();
 				}
 			}
-		} else if (phaseUpdate.newPhase == GameState.Phase.START) {
+		} else if (phaseUpdate.newPhase == GameModel.Phase.START) {
 			theScene.getPlayerModel().isVisible(false);
 			PolygonUnfilled[] mPolygonModels = theScene.getPolygonModels();
 			for (PolygonUnfilled p : mPolygonModels) {
 				p.isVisible(false);
 			}
-			if (phaseUpdate.oldPhase == GameState.Phase.GAMEOVER) {
+			if (phaseUpdate.oldPhase == GameModel.Phase.GAMEOVER) {
 				mGameState.setTotalTime(0);
 			}
 		}

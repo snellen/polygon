@@ -23,12 +23,12 @@ import android.view.MotionEvent;
 import ch.nellen.silvan.games.polygon.game.impl.PolygonGame;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonRenderer;
 
-public class PolygonSurfaceView extends GLSurfaceView {
+public class PolygonView extends GLSurfaceView {
 
 	private PolygonRenderer mRenderer;
 	private PolygonGame mGame;
 
-	public PolygonSurfaceView(Context context) {
+	public PolygonView(Context context) {
 		super(context);
 
 		mRenderer = new PolygonRenderer();

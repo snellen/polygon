@@ -19,13 +19,13 @@ package ch.nellen.silvan.games.polygon.game.impl;
 
 import java.util.Observable;
 
-import ch.nellen.silvan.games.polygon.game.IGameState;
+import ch.nellen.silvan.games.polygon.game.IGameModel;
 
 /*
  * Holds the important information about the game,
  * notifies listeners when the game phase changes or a new highscore is reached
  * */
-public class GameState extends Observable implements IGameState {
+public class GameModel extends Observable implements IGameModel {
 
 	private int mAngularDir = 0;
 	private long mTimeElapsed;
@@ -34,7 +34,7 @@ public class GameState extends Observable implements IGameState {
 	private Phase mCurrentPhase = Phase.START;
 	private Scene mScene;
 
-	public GameState(Scene s) {
+	public GameModel(Scene s) {
 		super();
 		mScene = s;
 	}

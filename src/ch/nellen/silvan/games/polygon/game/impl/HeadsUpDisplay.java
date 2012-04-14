@@ -25,7 +25,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
-import ch.nellen.silvan.games.polygon.game.IGameState;
+import ch.nellen.silvan.games.polygon.game.IGameModel;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
@@ -45,13 +45,13 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 	private int mScreenWidth;
 	private int mScreenHeight;
 
-	private GameState mGameState;
+	private GameModel mGameState;
 
 	private static int DIST_FROM_SIDE = 20;
 	private static int DIST_FROM_TOP = 10;
 	public static int MAX_WIDTH_FROM_TOP = 90;
 
-	public HeadsUpDisplay(IRenderer r, Context context, GameState gameState) {
+	public HeadsUpDisplay(IRenderer r, Context context, GameModel gameState) {
 		super();
 
 		mGameState = gameState;
@@ -120,7 +120,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 
 		if (pauseButton.isVisible() && touchOn(evX, evY, pauseButton)) {
 			if (inputValid)
-				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+				mGameState.setCurrentPhase(IGameModel.Phase.PAUSED);
 			return true; // Event handled
 		}
 
@@ -132,18 +132,18 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			}
 		}
 
-		if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
-				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
+		if (mGameState.getCurrentPhase() == IGameModel.Phase.PAUSED
+				|| mGameState.getCurrentPhase() == IGameModel.Phase.START) {
 			if (inputValid
-					&& (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED)
+					&& (mGameState.getCurrentPhase() == IGameModel.Phase.PAUSED)
 					|| startTimer <= 0)
-				mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
+				mGameState.setCurrentPhase(IGameModel.Phase.RUNNING);
 			return true;
 		}
 
-		if (mGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
+		if (mGameState.getCurrentPhase() == IGameModel.Phase.GAMEOVER) {
 			if (inputValid)
-				mGameState.setCurrentPhase(IGameState.Phase.START);
+				mGameState.setCurrentPhase(IGameModel.Phase.START);
 			return true;
 		}
 
@@ -160,7 +160,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		if (startTimer > 0)
 			startTimer -= timeElapsed;
 
-		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
+		if (mGameState.getCurrentPhase() == GameModel.Phase.RUNNING) {
 			updateTimeDisplay();
 		}
 
@@ -239,7 +239,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		if (data == null)
 			return;
 
-		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) data;
+		GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) data;
 		switch (phaseUpdate.newPhase) {
 		case START:
 			startTimer = 250;

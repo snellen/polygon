@@ -73,7 +73,7 @@ public class PolygonActivity extends Activity {
 
 		// Create a GLSurfaceView instance and set it
 		// as the ContentView for this Activity.
-		mGLView = new PolygonSurfaceView(this);
+		mGLView = new PolygonView(this);
 		setContentView(mGLView);
 
 		musicPlayer.start();

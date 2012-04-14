@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.view.MotionEvent;
-import ch.nellen.silvan.games.polygon.game.IGameState;
+import ch.nellen.silvan.games.polygon.game.IGameModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderEventHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
@@ -33,8 +33,8 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 public class PolygonGame implements Observer, IRenderEventHandler {
 	private Handler mHandler = null;
 
-	private GameState mGameState = null;
-	private GameLogic mGameLogic = null;
+	private GameModel mGameState = null;
+	private GameController mGameLogic = null;
 	private PlayerController mGameController = null;
 	private HeadsUpDisplay mHud = null;
 
@@ -56,12 +56,12 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 		SharedPreferences prefs = context
 				.getSharedPreferences(PREFERENCES, 0/* MODE_PRIVATE */);
 
-		mGameState = new GameState(new Scene(renderer));
+		mGameState = new GameModel(new Scene(renderer));
 		mGameState.updateHighscore(prefs.getLong(PREFERENCES_BEST, 0));
 		mGameState.addObserver(this);
 		mHud = new HeadsUpDisplay(renderer, context, mGameState);
 		mGameController = new PlayerController(renderer, mGameState);
-		mGameLogic = new GameLogic(mGameState);
+		mGameLogic = new GameController(mGameState);
 
 		mHandler = new Handler();
 	}
@@ -94,8 +94,8 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	}
 
 	public void onPause() {
-		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING)
-			mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+		if (mGameState.getCurrentPhase() == GameModel.Phase.RUNNING)
+			mGameState.setCurrentPhase(IGameModel.Phase.PAUSED);
 	}
 	
 	
@@ -108,7 +108,7 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (arg1 == null) {
-			GameState gs = (GameState) arg0;
+			GameModel gs = (GameModel) arg0;
 			final long highscore = gs.getCurrentHighscore();
 			mHandler.post(new Runnable() {
 				@Override

@@ -22,7 +22,7 @@ import java.util.Observer;
 
 import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
-import ch.nellen.silvan.games.polygon.game.IGameState;
+import ch.nellen.silvan.games.polygon.game.IGameModel;
 import ch.nellen.silvan.games.polygon.game.InputHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
@@ -31,9 +31,9 @@ public class PlayerController extends InputHandler implements Observer {
 
 	private ImageSprite leftKey;
 	private ImageSprite rightKey;
-	private GameState mGameState;
+	private GameModel mGameState;
 
-	public PlayerController(IRenderer r, GameState gameState) {
+	public PlayerController(IRenderer r, GameModel gameState) {
 		super();
 		mGameState = gameState;
 		mGameState.addObserver(this);
@@ -54,7 +54,7 @@ public class PlayerController extends InputHandler implements Observer {
 			final MotionEvent event) {
 
 		if (acceptInput()
-				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
+				&& mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				mGameState.setPlayerAngularDir(0);
 			} else {
@@ -75,7 +75,7 @@ public class PlayerController extends InputHandler implements Observer {
 		if (data == null)
 			return;
 
-		GameState.PhaseChange phaseUpdate = (GameState.PhaseChange) data;
+		GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) data;
 		switch (phaseUpdate.newPhase) {
 		case RUNNING:
 			rightKey.isVisible(true);
