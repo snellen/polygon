@@ -6,6 +6,7 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
 public class PolygonUnfilled extends PolygonModel {
 	// Properties
@@ -13,9 +14,8 @@ public class PolygonUnfilled extends PolygonModel {
 	private int numEdgesEnabled = NUMBER_OF_VERTICES;
 	private float mWidth = 0.5f;
 
-	public PolygonUnfilled() {
-		super();
-		PolygonRenderer.instance().registerRenderable3D(this);
+	public PolygonUnfilled(IRenderer r) {
+		super(r);
 	}
 
 	public void setWidth(float w) {

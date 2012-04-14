@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLUtils;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import ch.nellen.silvan.games.polygon.graphics.ISprite;
 
 public abstract class Sprite extends Renderable implements ISprite {
@@ -27,7 +28,7 @@ public abstract class Sprite extends Renderable implements ISprite {
 	private FloatBuffer mVertexBuffer = null;
 	protected int[] mTextureId = new int[1];
 
-	public Sprite() {
+	public Sprite(IRenderer r) {
 		super();
 		if (cIndiceBuffer == null) {
 			short[] indices = new short[] { 0, 1, 2, 0, 2, 3 };
@@ -59,6 +60,7 @@ public abstract class Sprite extends Renderable implements ISprite {
 		}
 
 		mTextureId[0] = -1;
+		r.registerRenderable2D(this);
 	}
 
 	@Override

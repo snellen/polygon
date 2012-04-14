@@ -7,24 +7,26 @@ import android.view.MotionEvent;
 import ch.nellen.silvan.games.R;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.InputHandler;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 
 public class PlayerController extends InputHandler implements Observer {
 
 	private ImageSprite leftKey;
 	private ImageSprite rightKey;
+	private GameState mGameState;
 
-	public PlayerController() {
+	public PlayerController(IRenderer r, GameState gameState) {
 		super();
-		
-		GameState.instance().addObserver(this);
+		mGameState = gameState;
+		mGameState.addObserver(this);
 
-		leftKey = new ImageSprite(R.drawable.key_left);
+		leftKey = new ImageSprite(r,R.drawable.key_left);
 		leftKey.setX(0);
 		leftKey.setY(0);
 		leftKey.isVisible(false);
 
-		rightKey = new ImageSprite(R.drawable.key_right);
+		rightKey = new ImageSprite(r,R.drawable.key_right);
 		rightKey.setX(0);
 		rightKey.setY(0);
 		rightKey.isVisible(false);
@@ -35,16 +37,16 @@ public class PlayerController extends InputHandler implements Observer {
 			final MotionEvent event) {
 
 		if (acceptInput()
-				&& GameState.instance().getCurrentPhase() == IGameState.Phase.RUNNING) {
+				&& mGameState.getCurrentPhase() == IGameState.Phase.RUNNING) {
 			if (event.getAction() == MotionEvent.ACTION_UP) {
-				GameState.instance().setPlayerAngularDir(0);
+				mGameState.setPlayerAngularDir(0);
 			} else {
 				float glX = event.getX() - screenWidth / 2;
 				// float glY = -(event.getY()-screenHeight/2);
-				GameState.instance().setPlayerAngularDir(glX < 0 ? 1 : -1);
+				mGameState.setPlayerAngularDir(glX < 0 ? 1 : -1);
 			}
 		} else {
-			GameState.instance().setPlayerAngularDir(0);
+			mGameState.setPlayerAngularDir(0);
 		}
 
 		return true;
@@ -68,7 +70,7 @@ public class PlayerController extends InputHandler implements Observer {
 			rightKey.isVisible(false);
 			leftKey.isVisible(false);
 		}
-		GameState.instance().setPlayerAngularDir(0);
+		mGameState.setPlayerAngularDir(0);
 	}
 
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {

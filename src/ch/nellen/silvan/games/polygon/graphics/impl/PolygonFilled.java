@@ -6,12 +6,12 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.opengles.GL10;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
 public class PolygonFilled extends PolygonModel {
 
-	public PolygonFilled() {
-		super();
-		PolygonRenderer.instance().registerRenderable3D(this);
+	public PolygonFilled(IRenderer r) {
+		super(r);
 	}
 
 	public void render(IRenderContext rc) {

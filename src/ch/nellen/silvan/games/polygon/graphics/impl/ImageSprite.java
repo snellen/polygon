@@ -1,5 +1,6 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,10 +12,9 @@ public class ImageSprite extends Sprite {
 	private Bitmap mBitmap = null;
 	private int mResourceId = -1;
 
-	public ImageSprite(int id) {
-		super();
+	public ImageSprite(IRenderer r, int id) {
+		super(r);
 		mResourceId = id;
-		PolygonRenderer.instance().registerRenderable2D(this);
 	}
 
 	// Overrides height and width

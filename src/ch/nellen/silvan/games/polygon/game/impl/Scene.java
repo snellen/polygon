@@ -1,5 +1,6 @@
 package ch.nellen.silvan.games.polygon.game.impl;
 
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import ch.nellen.silvan.games.polygon.graphics.impl.PlayerModel;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonFilled;
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
@@ -15,23 +16,23 @@ public class Scene {
 	private float CENTER_RADIUS;
 	private float CENTER_WIDTH;
 
-	public Scene() {
+	public Scene(IRenderer r) {
 		super();
 
-		mCenterPolygon = new PolygonFilled();
+		mCenterPolygon = new PolygonFilled(r);
 		mCenterPolygon.setZCoord(0.011f);
 		mCenterPolygon.setColor(0, 0, 0, 1);
-		mCenterPolygonBorder = new PolygonFilled();
+		mCenterPolygonBorder = new PolygonFilled(r);
 		mCenterPolygonBorder.setZCoord(0.011f);
 		;
 
-		mPlayerModel = new PlayerModel();
+		mPlayerModel = new PlayerModel(r);
 		mPlayerModel.setAngle(90);
 		mPlayerModel.setZCoord(0.011f);
 
 		mPolygonModels = new PolygonUnfilled[MAXMODELS];
 		for (int i = 0; i < mPolygonModels.length; ++i) {
-			mPolygonModels[i] = new PolygonUnfilled();
+			mPolygonModels[i] = new PolygonUnfilled(r);
 			mPolygonModels[i].setZCoord(0.0f);
 			mPolygonModels[i].isVisible(false);
 		}

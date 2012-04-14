@@ -11,13 +11,12 @@ import ch.nellen.silvan.games.R;
 import ch.nellen.silvan.games.polygon.game.IGameState;
 import ch.nellen.silvan.games.polygon.game.IUpdatable;
 import ch.nellen.silvan.games.polygon.game.InputHandler;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import ch.nellen.silvan.games.polygon.graphics.ISprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
 public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer {
-
-	public static int MAX_WIDTH_FROM_TOP = 90;
 
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
@@ -29,19 +28,23 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 	private int mScreenWidth;
 	private int mScreenHeight;
 
+	private GameState mGameState;
+
 	private static int DIST_FROM_SIDE = 20;
 	private static int DIST_FROM_TOP = 10;
+	public static int MAX_WIDTH_FROM_TOP = 90;
 
-	public HeadsUpDisplay(Context context) {
+	public HeadsUpDisplay(IRenderer r, Context context, GameState gameState) {
 		super();
 
-		GameState.instance().addObserver(this);
+		mGameState = gameState;
+		mGameState.addObserver(this);
 
 		int background = Color.argb(128, (int) (0.3f * 255),
 				(int) (0.3f * 255), (int) (0.3f * 255));
 		int textColor = Color.argb(255, (int) (0.93671875f * 255),
 				(int) (0.16953125f * 255), (int) (0.02265625f * 255));
-		pauseButton = new TextSprite();
+		pauseButton = new TextSprite(r);
 		pauseButton.setBackgroundColor(background);
 		pauseButton.setTextColor(textColor);
 		pauseButton.setText("PAUSE");
@@ -49,14 +52,14 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		pauseButton.setPaddingVertical(10);
 		pauseButton.isVisible(false);
 
-		totalTime = new TextSprite();
+		totalTime = new TextSprite(r);
 		totalTime.setBackgroundColor(background);
 		totalTime.setTextColor(textColor);
-		totalTime.setText("HIGHSCORE " + formatTime(GameState.instance().getCurrentHighscore()));
+		totalTime.setText("HIGHSCORE " + formatTime(mGameState.getCurrentHighscore()));
 		totalTime.setPaddingHorizontal(5);
 		totalTime.setPaddingVertical(5);
 
-		fpsDisplay = new TextSprite();
+		fpsDisplay = new TextSprite(r);
 		fpsDisplay.setBackgroundColor(Color.TRANSPARENT);
 		fpsDisplay.setTextColor(textColor);
 		fpsDisplay.setPaddingHorizontal(5);
@@ -65,14 +68,14 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		fpsDisplay.setTextSize(14);
 		fpsDisplay.isVisible(false);
 
-		pausedText = new TextSprite();
+		pausedText = new TextSprite(r);
 		pausedText.setBackgroundColor(Color.TRANSPARENT);
 		pausedText.setTextColor(textColor);
 		pausedText.setText("TAP TO START");
 
-		logo = new ImageSprite(R.drawable.logo);
+		logo = new ImageSprite(r, R.drawable.logo);
 		
-		mCredits = new ImageSprite(R.drawable.credits);
+		mCredits = new ImageSprite(r, R.drawable.credits);
 
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
 				"It_wasn_t_me.ttf");
@@ -96,12 +99,11 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		float evX = event.getX();
 		float evY = event.getY();
 
-		GameState theGameState = GameState.instance();
 		boolean inputValid = (event.getAction() == MotionEvent.ACTION_UP && acceptInput());
 
 		if (pauseButton.isVisible() && touchOn(evX, evY, pauseButton)) {
 			if (inputValid)
-				theGameState.setCurrentPhase(IGameState.Phase.PAUSED);
+				mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
 			return true; // Event handled
 		}
 
@@ -113,18 +115,18 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			}
 		}
 
-		if (theGameState.getCurrentPhase() == IGameState.Phase.PAUSED
-				|| theGameState.getCurrentPhase() == IGameState.Phase.START) {
+		if (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED
+				|| mGameState.getCurrentPhase() == IGameState.Phase.START) {
 			if (inputValid
-					&& (theGameState.getCurrentPhase() == IGameState.Phase.PAUSED)
+					&& (mGameState.getCurrentPhase() == IGameState.Phase.PAUSED)
 					|| startTimer <= 0)
-				theGameState.setCurrentPhase(IGameState.Phase.RUNNING);
+				mGameState.setCurrentPhase(IGameState.Phase.RUNNING);
 			return true;
 		}
 
-		if (theGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
+		if (mGameState.getCurrentPhase() == IGameState.Phase.GAMEOVER) {
 			if (inputValid)
-				theGameState.setCurrentPhase(IGameState.Phase.START);
+				mGameState.setCurrentPhase(IGameState.Phase.START);
 			return true;
 		}
 
@@ -141,7 +143,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		if (startTimer > 0)
 			startTimer -= timeElapsed;
 
-		if (GameState.instance().getCurrentPhase() == GameState.Phase.RUNNING) {
+		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING) {
 			updateTimeDisplay();
 		}
 
@@ -160,7 +162,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 
 	private void updateTimeDisplay() {
 		String timeString;
-		long time = GameState.instance().getTotalTime();
+		long time = mGameState.getTotalTime();
 		timeString = "TIME " + formatTime(time);
 		setTimeText(timeString);
 	}
@@ -230,7 +232,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			setTimeText("HIGHSCORE " + formatTime(GameState.instance().getCurrentHighscore()));
+			setTimeText("HIGHSCORE " + formatTime(mGameState.getCurrentHighscore()));
 			break;
 		case RUNNING:
 			logo.isVisible(false);

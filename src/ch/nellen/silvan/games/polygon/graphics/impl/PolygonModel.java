@@ -3,6 +3,7 @@ package ch.nellen.silvan.games.polygon.graphics.impl;
 import android.content.Context;
 import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
 public abstract class PolygonModel extends Renderable implements IRenderable,
 		IPolygonModel {
@@ -22,7 +23,7 @@ public abstract class PolygonModel extends Renderable implements IRenderable,
 
 	protected RGBAColor mColor = new RGBAColor(0, 0, 0, 1);
 
-	public PolygonModel() {
+	public PolygonModel(IRenderer r) {
 		super();
 
 		mAngle = 0.0f;
@@ -40,6 +41,7 @@ public abstract class PolygonModel extends Renderable implements IRenderable,
 			}
 		}
 		setColor(((float) 238) / 255, ((float) 244) / 255, 0, 1);
+		r.registerRenderable3D(this);
 	}
 
 	/*

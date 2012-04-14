@@ -1,131 +1,64 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.os.Handler;
 import android.os.SystemClock;
-import android.view.MotionEvent;
-import ch.nellen.silvan.games.polygon.game.IGameState;
-import ch.nellen.silvan.games.polygon.game.IUpdatable;
-import ch.nellen.silvan.games.polygon.game.impl.GameLogic;
-import ch.nellen.silvan.games.polygon.game.impl.GameState;
-import ch.nellen.silvan.games.polygon.game.impl.HeadsUpDisplay;
-import ch.nellen.silvan.games.polygon.game.impl.PlayerController;
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.IRenderEventHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderable;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
 public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
-
-	private static PolygonRenderer instance = null;
-	public static PolygonRenderer instance() {
-		if(instance == null)
-			instance = new PolygonRenderer();
-		return instance;
-	}
-	
 	private IRenderContext mRenderContext = null;
 	private Vector<IRenderable> mRenderables3D = new Vector<IRenderable>(16);
 	private Vector<IRenderable> mRenderables2D = new Vector<IRenderable>(16);
-	long lastUpdate = 0;
-	private boolean mInitialized = false;
+	private long lastUpdate = 0;
+
 	private int mScreenWidth;
 	private int mScreenHeight;
 	private static final float Z_NEAR = 2;
 	private float mScreenRadiusZNearRatio;
 
-	public static final String PREFERENCES = PolygonGame.class.getName();
-	public static final String PREFERENCES_BEST = "POLYGONBESTTIME";
-	private Context mContext;
+	private boolean mIsInitialized = false;
 
-	// To keep all game specific code in one place...
-	public class PolygonGame implements IUpdatable, Observer {
-		private Handler mHandler = null;
+	private IRenderEventHandler mEventHandler = null;
 
-		private GameLogic mGameLogic = null;
-		private PlayerController mGameController = null;
-		private HeadsUpDisplay mHud = null;
+	private float mCameraZ = 0f;
 
-		public PolygonGame(Context context) {
-			SharedPreferences prefs = mContext.getSharedPreferences(
-					PolygonRenderer.PREFERENCES, 0/* MODE_PRIVATE */);
-			GameState.instance().updateHighscore(prefs.getLong(PREFERENCES_BEST, 0));
-			GameState.instance().addObserver(this);
-
-			mHud = new HeadsUpDisplay(context);
-			mGameController = new PlayerController();
-			mGameLogic = new GameLogic();
-			mHandler = new Handler();
-		}
-
-		public float getCameraZ() {
-			return GameState.instance().getCameraZ();
-		}
-
-		@Override
-		public void update(long timeElapsed) {
-			mGameLogic.update(timeElapsed);
-			mHud.update(timeElapsed);
-		}
-
-		public void onSurfaceChanged() {
-			mHud.onSurfaceChanged(mScreenWidth, mScreenHeight);
-			mGameController.onSurfaceChanged(mScreenWidth, mScreenHeight);
-			mGameLogic.onSurfaceChanged(mScreenWidth, mScreenHeight);
-		}
-
-		public void handleTouchEvent(float screenWidth, float screenHeight,
-				MotionEvent event) {
-			if (!mHud.handleMotionEvent(screenWidth, screenHeight, event))
-				mGameController.handleMotionEvent(screenWidth, screenHeight,
-						event);
-		}
-
-		@Override
-		public void update(Observable arg0, Object arg1) {
-			if (arg1 == null) {
-				GameState gs = (GameState) arg0;
-				final long highscore = gs.getCurrentHighscore();
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						SharedPreferences prefs = mContext
-								.getSharedPreferences(
-										PolygonRenderer.PREFERENCES, 0/* MODE_PRIVATE */);
-						Editor editor = prefs.edit();
-						editor.putLong(PREFERENCES_BEST, highscore);
-						editor.commit();
-					}
-				});
-			}
-		}
-
-		public void onPause() {
-			if (GameState.instance().getCurrentPhase() == GameState.Phase.RUNNING)
-				GameState.instance().setCurrentPhase(IGameState.Phase.PAUSED);
-		}
-	}
-
-	public PolygonGame mGame = null;
-
-	private PolygonRenderer() {
+	public PolygonRenderer() {
 		super();
 	}
 
+	public void setEventHandler(IRenderEventHandler eventHandler) {
+		mEventHandler = eventHandler;
+	}
+
 	public void init(Context context) {
-		mContext = context;
 		mRenderContext = new RenderContext(this);
-		mGame = new PolygonGame(context);
+		mEventHandler.init(this, context);
+		for (IRenderable r : mRenderables3D) {
+			r.init(context);
+		}
+		for (IRenderable r : mRenderables2D) {
+			r.init(context);
+		}
+		mIsInitialized = true;
+	}
+
+	@Override
+	public float getCameraZ() {
+		return mCameraZ;
+	}
+
+	@Override
+	public void setCameraZ(float cameraZ) {
+		this.mCameraZ = cameraZ;
 	}
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -147,23 +80,18 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 
 	public void onDrawFrame(GL10 gl) {
 
-		if (!mInitialized) {
-			for (IRenderable r : mRenderables3D) {
-				r.init(mContext);
-			}
-			for (IRenderable r : mRenderables2D) {
-				r.init(mContext);
-			}
-			mInitialized = true;
+		if(!mIsInitialized){
+			String msg = "Attempt to render before init";
+			throw new RuntimeException(msg);
 		}
-
+		
 		// Update game
 		long currTime = SystemClock.uptimeMillis();
 		long timeElapsed = 0;
 		if (lastUpdate != 0)
 			timeElapsed = currTime - lastUpdate;
 
-		mGame.update(timeElapsed);
+		mEventHandler.onRender(this, timeElapsed);
 		lastUpdate = currTime;
 
 		/* Begin render 3D */
@@ -171,7 +99,7 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
-		GLU.gluLookAt(gl, 0, 0, mGame.getCameraZ(), 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+		GLU.gluLookAt(gl, 0, 0, mCameraZ, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 		mRenderContext.setGl(gl);
 		for (IRenderable r : mRenderables3D) {
 			if (r.isVisible()) {
@@ -233,13 +161,13 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		// matrix
 
 		mScreenRadiusZNearRatio = (float) (Math.sqrt(ratio * ratio + 1) / Z_NEAR);
-		
+
 		// Update Game
-		mGame.onSurfaceChanged();
+		mEventHandler.onSurfaceChanged(this, width, height);
 	}
 
 	public void onPause() {
-		mGame.onPause();
+		mEventHandler.onPause();
 	}
 
 	@Override
@@ -268,9 +196,9 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 			mRenderables2D.remove(r);
 	}
 
+	@Override
 	public float getScreenRadiusZNearRatio() {
 		return mScreenRadiusZNearRatio;
 	}
-	
-	
+
 }

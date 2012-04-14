@@ -1,5 +1,6 @@
 package ch.nellen.silvan.games.polygon.graphics.impl;
 
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,8 +24,11 @@ public class TextSprite extends Sprite {
 	
 	private static Paint cEraserPaint = null;
 
-	public TextSprite() {
-		super();
+	/*
+	 * @param r the renderer this TextSprite will be bound to
+	 */
+	public TextSprite(IRenderer r) {
+		super(r);
 
 		mTextPaint = new Paint();
 		mTextPaint.setAntiAlias(true);
@@ -40,8 +44,6 @@ public class TextSprite extends Sprite {
 			cEraserPaint.setAlpha(0);
 			cEraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
 		}
-		
-		PolygonRenderer.instance().registerRenderable2D(this);
 	}
 
 	public void setText(String text) {

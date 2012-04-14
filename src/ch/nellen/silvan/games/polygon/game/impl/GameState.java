@@ -15,25 +15,17 @@ public class GameState extends Observable implements IGameState {
 	private long mHighscore = 0;
 	private float mCameraZ;
 	private Phase mCurrentPhase = Phase.START;
-	private static Scene cScene;
+	private Scene mScene;
 
-	private static GameState instance = null;
-	public static GameState instance() {
-		if(instance == null)
-			instance = new GameState();
-		return instance;
-	}
-	
-	private GameState() {
+	public GameState(Scene s) {
 		super();
+		mScene = s;
 	}
-	
-	public static Scene getScene() {
-		if(cScene == null)
-			cScene = new Scene();
-		return cScene;
+
+	public Scene getScene() {
+		return mScene;
 	}
-	
+
 	@Override
 	public Phase getCurrentPhase() {
 		return mCurrentPhase;

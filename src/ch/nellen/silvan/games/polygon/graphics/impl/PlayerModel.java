@@ -8,6 +8,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 
 import ch.nellen.silvan.games.polygon.graphics.IRenderContext;
+import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
 public class PlayerModel extends Renderable {
 
@@ -22,8 +23,8 @@ public class PlayerModel extends Renderable {
 			-SIZE * 0.866025404f, 0 };
 	private float mZCoord;
 
-	public PlayerModel() {
-		PolygonRenderer.instance().registerRenderable3D(this);
+	public PlayerModel(IRenderer r) {
+		r.registerRenderable3D(this);
 		mColor = new RGBAColor(1f, 0f, 0f, 1f);
 		mZCoord = 0.0f;
 		mAngle = 0f;
