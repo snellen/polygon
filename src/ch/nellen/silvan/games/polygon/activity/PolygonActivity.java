@@ -11,7 +11,37 @@ import android.view.WindowManager;
 
 public class PolygonActivity extends Activity {
 	private GLSurfaceView mGLView;
-	private MediaPlayer mMediaPlayer;
+
+	private class InfiniteLoopMusicPlayer {
+
+		private MediaPlayer mMediaPlayer;
+
+		protected void start() {
+			if (mMediaPlayer == null) {
+				mMediaPlayer = MediaPlayer.create(getApplicationContext(),
+						R.raw.backgroundmusic1);
+				mMediaPlayer.setLooping(true);
+			}
+			mMediaPlayer.start();// no need to call prepare();
+									// create() does that for you
+			setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		}
+
+		protected void pause() {
+			if (mMediaPlayer != null)
+				mMediaPlayer.pause();
+		}
+
+		protected void terminate() {
+			if (mMediaPlayer != null) {
+				mMediaPlayer.release();
+				mMediaPlayer = null;
+			}
+			setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+		}
+	}
+
+	InfiniteLoopMusicPlayer musicPlayer = new InfiniteLoopMusicPlayer();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,10 +57,7 @@ public class PolygonActivity extends Activity {
 		mGLView = new PolygonSurfaceView(this);
 		setContentView(mGLView);
 
-		mMediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.backgroundmusic1);
-		mMediaPlayer.start(); // no need to call prepare(); create() does that
-								// for you
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		musicPlayer.start();
 	}
 
 	@Override
@@ -41,8 +68,7 @@ public class PolygonActivity extends Activity {
 		// you should consider de-allocating objects that
 		// consume significant memory here.
 		mGLView.onPause();
-		if (mMediaPlayer != null)
-			mMediaPlayer.pause();
+		musicPlayer.pause();
 	}
 
 	@Override
@@ -52,27 +78,12 @@ public class PolygonActivity extends Activity {
 		// If you de-allocated graphic objects for onPause()
 		// this is a good place to re-allocate them.
 		mGLView.onResume();
-		if (mMediaPlayer != null)
-			mMediaPlayer.start();
+		musicPlayer.start();
 	}
 
 	@Override
 	protected void onStop() {
-		if (mMediaPlayer != null) {
-			mMediaPlayer.release();
-			mMediaPlayer = null;
-		}
-		setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+		musicPlayer.terminate();
 		super.onStop();
 	}
-
-	@Override
-	protected void onStart() {
-		mMediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.backgroundmusic1);
-		mMediaPlayer.start(); // no need to call prepare(); create() does that
-								// for you
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		super.onStart();
-	}
-
 }
