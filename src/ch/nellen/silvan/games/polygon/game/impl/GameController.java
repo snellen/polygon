@@ -31,6 +31,7 @@ import ch.nellen.silvan.games.polygon.graphics.impl.RGBAColor;
 
 public class GameController implements IUpdatable, Observer {
 
+	private static final long SPIRALSALLOWED_AFTER = 10000; // ms
 	private static final long CHANGEDIR_INTERVAL = 10000; // ms
 	private static final RGBAColor[] COLORS = {
 			new RGBAColor(((float) 238) / 255, ((float) 24) / 255, 0, 1),
@@ -41,7 +42,7 @@ public class GameController implements IUpdatable, Observer {
 	private static final float CAM_SPEED = 4f / 1000;
 
 	private static final float PLAYERSPEED = 0.55f;
-	private static float MAX_ROTATION_SPEED = 0.20f;
+	private static float MAX_ROTATION_SPEED = 0.16f;
 	private static float MIN_ROTATION_SPEED = 0.10f;
 	
 	private float shrinkSpeed = 2.2f / 1000;
@@ -167,6 +168,9 @@ public class GameController implements IUpdatable, Observer {
 						.signum(Math.random() - 0.5));
 			}
 
+			if(SPIRALSALLOWED_AFTER < mGameState.getTotalTime())
+				polyAdv.setSpiralsAllowed(true);
+			
 			if (!cameraMoving)
 				updateMaxRadius(timeElapsed);
 
@@ -204,7 +208,6 @@ public class GameController implements IUpdatable, Observer {
 	}
 
 	public void onSurfaceChanged(IRenderer r, int mScreenWidth, int mScreenHeight) {
-
 		mMaxVisibleRadius = (float) (r.getScreenRadiusZNearRatio() * CAM_POSITION / Math
 				.cos(Math.PI / PolygonModel.NUMBER_OF_VERTICES));
 

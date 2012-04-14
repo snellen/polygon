@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import ch.nellen.silvan.games.polygon.graphics.impl.PolygonUnfilled;
@@ -25,7 +25,7 @@ public class PolygonAdversary {
 	static abstract class Configurator {
 		protected void setDefaultRadius(PolygonUnfilled polygon,
 				float maxVisibleR, float maxR) {
-			polygon.setRadius((float) (maxR + (Math.random() * 0.1 + 0.35)
+			polygon.setRadius((float) (maxR + (Math.random() * 0.1 + 0.27)
 					* maxVisibleR));
 			polygon.setWidth((float) (Math.random() * 0.005 + 0.09)
 					* maxVisibleR);
@@ -91,12 +91,12 @@ public class PolygonAdversary {
 				// Spiral
 				int phase = 0;
 				int index = 0;
+				int dir = 1;
 
 				private void skip(PolygonUnfilled polygon, float maxVisibleR,
 						float maxR) {
-					int i = (int) (currentConfig + Math.random()
-							* (configurators.length - 1))
-							% configurators.length;
+					int i = (int) (Math.random() * (configurators.length - 2)); // No
+																				// spirals
 					configurators[i].configureNextPolygon(polygon, maxVisibleR,
 							maxR);
 				}
@@ -105,13 +105,14 @@ public class PolygonAdversary {
 				public void configureNextPolygon(PolygonUnfilled polygon,
 						float maxVisibleR, float maxR) {
 
-					if (phase == 0 && Math.random() < 0.7) {
+					if (!mSpiralsAllowed || (phase == 0 && Math.random() < 0.5)) {
 						skip(polygon, maxVisibleR, maxR);
 						return;
 					}
 
 					if (phase == 0) {
 						index = (int) (Math.random() * (IPolygonModel.NUMBER_OF_VERTICES));
+						dir = Math.random() > 0.5 ? 1 : -1;
 						maxR += (Math.random() * 0.1 + 0.45) * maxVisibleR;
 					}
 
@@ -138,17 +139,90 @@ public class PolygonAdversary {
 					} else {
 						edgeEnabled[index] = true;
 					}
-					index = (index - 1);
-					if (index < 0)
-						index += edgeEnabled.length;
+					index = (index + dir);
+					index = index < 0 ? index += edgeEnabled.length : index
+							% edgeEnabled.length;
 				}
 
 				void reset() {
 					phase = 0;
 				}
+			}, new Configurator() {
+
+				int phase = 0;
+				int index = 0;
+				int dir = 1;
+
+				private void skip(PolygonUnfilled polygon, float maxVisibleR,
+						float maxR) {
+					int i = (int) (Math.random() * (configurators.length - 2)); // No
+																				// spirals
+					configurators[i].configureNextPolygon(polygon, maxVisibleR,
+							maxR);
+				}
+
+				@Override
+				protected void setEdges(boolean[] edgeEnabled) {
+					for (int j = 0; j < edgeEnabled.length; ++j) {
+						edgeEnabled[j] = false;
+					}
+					edgeEnabled[index] = true;
+					index = (index + dir);
+					index = index < 0 ? index += edgeEnabled.length : index
+							% edgeEnabled.length;
+				}
+
+				@Override
+				public void configureNextPolygon(PolygonUnfilled polygon,
+						float maxVisibleR, float maxR) {
+
+					if (!mSpiralsAllowed || (phase == 0 && Math.random() < 0.5)) {
+						skip(polygon, maxVisibleR, maxR);
+						return;
+					}
+
+					float width = 0.2f * maxVisibleR;
+
+					if (phase == 0) {
+						index = (int) (Math.random() * (IPolygonModel.NUMBER_OF_VERTICES));
+						dir = Math.random() > 0.5 ? 1 : -1;
+						maxR += (Math.random() * 0.1 + 0.45) * maxVisibleR;
+					} else {
+						maxR -= width *0.6;
+					}
+
+					setEdges(polygon.getEdgesEnabled());
+
+					polygon.setWidth(width);
+					polygon.setRadius(maxR);
+
+					phase++;
+
+					if (phase == 8) {
+						currentConfig = getRandomConfig();
+						reset();
+					}
+				}
+
+				@Override
+				void reset() {
+					phase = 0;
+				}
+
 			} };
 
 	static int currentConfig;
+
+	private static boolean mSpiralsAllowed = false;
+	
+
+	public boolean isSpiralsAllowed() {
+		return mSpiralsAllowed;
+	}
+
+	public void setSpiralsAllowed(boolean spiralsAllowed) {
+		mSpiralsAllowed = spiralsAllowed;
+	}
 
 	public PolygonAdversary() {
 		super();
@@ -162,12 +236,13 @@ public class PolygonAdversary {
 	}
 
 	void reset() {
+		mSpiralsAllowed  = false;
 		for (Configurator c : configurators)
 			c.reset();
 	}
 
 	static private int getRandomConfig() {
-		return (int) (Math.random() * configurators.length);
+		return (int) ( Math.random()*configurators.length);
 	}
 
 }
