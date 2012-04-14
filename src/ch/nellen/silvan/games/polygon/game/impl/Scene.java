@@ -41,7 +41,6 @@ public class Scene {
 		mCenterPolygon.setColor(0, 0, 0, 1);
 		mCenterPolygonBorder = new PolygonFilled(r);
 		mCenterPolygonBorder.setZCoord(0.011f);
-		;
 
 		mPlayerModel = new PlayerModel(r);
 		mPlayerModel.setAngle(90);
@@ -81,7 +80,7 @@ public class Scene {
 
 		mPlayerModel
 				.setRadius((float) (CENTER_RADIUS + CENTER_WIDTH + mMaxVisibleRadius * 0.01));
-		mPlayerModel.setSize((float) (0.01*mMaxVisibleRadius));
+		mPlayerModel.setSize((float) (0.015*mMaxVisibleRadius));
 		mCenterPolygonBorder.setRadius(CENTER_RADIUS + CENTER_WIDTH);
 		mCenterPolygon.setRadius(CENTER_RADIUS);
 	}

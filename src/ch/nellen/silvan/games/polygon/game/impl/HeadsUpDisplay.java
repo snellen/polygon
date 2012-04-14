@@ -80,7 +80,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		fpsDisplay.setBackgroundColor(Color.TRANSPARENT);
 		fpsDisplay.setTextColor(textColor);
 		fpsDisplay.setPaddingHorizontal(5);
-		fpsDisplay.setPaddingVertical(5);
+		fpsDisplay.setPaddingVertical(10);
 		fpsDisplay.setText("FPS  0");
 		fpsDisplay.setTextSize(14);
 		fpsDisplay.isVisible(false);
