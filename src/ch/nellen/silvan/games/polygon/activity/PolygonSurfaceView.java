@@ -52,4 +52,16 @@ public class PolygonSurfaceView extends GLSurfaceView {
 		return true;
 
 	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		queueEvent(new Runnable() {
+			public void run() {
+				mGame.onPause();
+			}
+		});
+	}
+	
+	
 }

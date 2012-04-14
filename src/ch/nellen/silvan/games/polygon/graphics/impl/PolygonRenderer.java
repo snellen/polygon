@@ -183,10 +183,6 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 		mEventHandler.onSurfaceChanged(this, width, height);
 	}
 
-	public void onPause() {
-		mEventHandler.onPause();
-	}
-
 	@Override
 	public void registerRenderable3D(IRenderable r) {
 		if (!mRenderables3D.contains(r)) {

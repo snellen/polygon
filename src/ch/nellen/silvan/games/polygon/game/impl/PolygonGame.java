@@ -93,14 +93,6 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 		mGameLogic.onSurfaceChanged(r, width, height);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ch.nellen.silvan.games.polygon.graphics.impl.IRenderEventHandler#onPause
-	 * ()
-	 */
-	@Override
 	public void onPause() {
 		if (mGameState.getCurrentPhase() == GameState.Phase.RUNNING)
 			mGameState.setCurrentPhase(IGameState.Phase.PAUSED);
