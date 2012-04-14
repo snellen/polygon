@@ -20,15 +20,17 @@ public class PolygonActivity extends Activity {
 			if (mMediaPlayer == null) {
 				mMediaPlayer = MediaPlayer.create(getApplicationContext(),
 						R.raw.backgroundmusic1);
+				// no need to call prepare();
+				// create() does that for you
 				mMediaPlayer.setLooping(true);
 			}
-			mMediaPlayer.start();// no need to call prepare();
-									// create() does that for you
+			if (!mMediaPlayer.isPlaying())
+				mMediaPlayer.start();
 			setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		}
 
 		protected void pause() {
-			if (mMediaPlayer != null)
+			if (mMediaPlayer != null && mMediaPlayer.isPlaying())
 				mMediaPlayer.pause();
 		}
 
