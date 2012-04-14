@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import ch.nellen.silvan.games.polygon.graphics.IPolygonModel;
@@ -33,23 +33,24 @@ public class CollisionDetection {
 		return false;
 	}
 
+	float[] radii = new float[3];
+	float[] angles = new float[3];
+	float sectorAngle = (360 / IPolygonModel.NUMBER_OF_VERTICES);
+
 	private boolean checkCollision(PlayerModel player, PolygonUnfilled candidate) {
 		if (candidate.isVisible()) {
 			float tangAngle = (float) (90 * player.getTangentialSize() / (player
 					.getRadius() * Math.PI * Math.PI));
-			float[] radii = new float[] {
-					player.getRadius() + player.getSize(),
-					player.getRadius() - player.getSize() / 2,
-					player.getRadius() - player.getSize() / 2 };
-			float[] angles = new float[] { player.getAngle(),
-					player.getAngle() + tangAngle,
-					player.getAngle() - tangAngle };
+			radii[0] = player.getRadius() + player.getSize();
+			radii[1] = player.getRadius() - player.getSize() / 2;
+			radii[2] = player.getRadius() - player.getSize() / 2;
+			angles[0] = player.getAngle();
+			angles[1] = player.getAngle() + tangAngle;
+			angles[2] = player.getAngle() - tangAngle;
 			int i = 0;
-			float sectorAngle = (360 / IPolygonModel.NUMBER_OF_VERTICES);
-			for (float r: radii) {
+			for (float r : radii) {
 				if (r > candidate.getRadius()
-						&& r < candidate.getRadius()
-								+ candidate.getWidth()) {
+						&& r < candidate.getRadius() + candidate.getWidth()) {
 
 					float relativeAngle = angles[i] - candidate.getAngle();
 					if (relativeAngle < 0f) {

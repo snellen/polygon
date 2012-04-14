@@ -41,7 +41,7 @@ public class GameController implements IUpdatable, Observer {
 	private static final float CAM_POSITION = 5f;
 	private static final float CAM_SPEED = 4f / 1000;
 
-	private static final float PLAYERSPEED = 0.55f;
+	private static final float PLAYERSPEED = 0.45f;
 	private static float MAX_ROTATION_SPEED = 0.16f;
 	private static float MIN_ROTATION_SPEED = 0.10f;
 	
