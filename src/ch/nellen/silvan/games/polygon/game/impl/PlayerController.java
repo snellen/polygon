@@ -93,7 +93,7 @@ public class PlayerController extends InputHandler implements Observer {
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {
 		int distTop = HeadsUpDisplay.MAX_WIDTH_FROM_TOP, distBorder = (int) (screenWidth * 0.02);
 		int keyWidth = screenWidth / 6;
-		int keyHeight = screenHeight - distTop;
+		int keyHeight = screenHeight - distTop- distBorder;
 
 		leftKey.setX(distBorder);
 		leftKey.setY(distTop);

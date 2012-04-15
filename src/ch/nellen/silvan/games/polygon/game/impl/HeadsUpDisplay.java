@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import java.util.Observable;
@@ -33,7 +33,8 @@ import ch.nellen.silvan.games.polygon.graphics.ISprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 import ch.nellen.silvan.games.polygon.graphics.impl.TextSprite;
 
-public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer {
+public class HeadsUpDisplay extends InputHandler implements IUpdatable,
+		Observer {
 
 	private TextSprite pauseButton;
 	private TextSprite pausedText;
@@ -70,9 +71,10 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		pauseButton.isVisible(false);
 
 		totalTime = new TextSprite(r);
-		totalTime.setBackgroundColor(background);
+		totalTime.setBackgroundColor(Color.TRANSPARENT);
 		totalTime.setTextColor(textColor);
-		totalTime.setText("HIGHSCORE " + formatTime(mGameState.getCurrentHighscore()));
+		totalTime.setText("HIGHSCORE "
+				+ formatTime(mGameState.getCurrentHighscore()));
 		totalTime.setPaddingHorizontal(5);
 		totalTime.setPaddingVertical(5);
 
@@ -91,7 +93,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		pausedText.setText("TAP TO START");
 
 		logo = new ImageSprite(r, R.drawable.logo);
-		
+
 		mCredits = new ImageSprite(r, R.drawable.credits);
 
 		Typeface tf = Typeface.createFromAsset(context.getAssets(),
@@ -186,7 +188,12 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 
 	private void setTimeText(String txt) {
 		totalTime.setText(txt);
-		totalTime.setX(mScreenWidth - totalTime.getWidth() - DIST_FROM_SIDE);
+		int x = totalTime.getX();
+		if (x + totalTime.getWidth() > mScreenWidth
+				|| x + totalTime.getWidth() < mScreenWidth - 3 * DIST_FROM_SIDE) {
+			x = mScreenWidth - totalTime.getWidth() - DIST_FROM_SIDE;
+		}
+		totalTime.setX(x);
 	}
 
 	String formatTime(long time) {
@@ -216,13 +223,18 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 		pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 		pausedText.setY(logo.getY() + logo.getHeight() + 5);
 
-		int dim = (int) (mScreenWidth*((float)9)/10);
+		int dim = (int) (mScreenWidth * ((float) 9) / 10);
 		mCredits.setWidth(dim);
 		mCredits.setHeight(dim);
 		mCredits.setX((mScreenWidth - mCredits.getWidth()) / 2);
-		mCredits.setY((int) (mScreenHeight-((float)21)/256*dim));
-		
+		mCredits.setY((int) (mScreenHeight - ((float) 21) / 256 * dim));
+
 		pauseButton.setTextSize(52 * mScreenHeight / 600);
+		int padding = pauseButton.getPaddingHorizontal();
+		padding = Math
+				.max(0,
+						(mScreenWidth / 6 - (pauseButton.getWidth() - padding * 2)) / 2);
+		pauseButton.setPaddingHorizontal(padding);
 		pauseButton.setX(DIST_FROM_SIDE);
 		pauseButton.setY(Math.min(MAX_WIDTH_FROM_TOP - pauseButton.getHeight(),
 				DIST_FROM_TOP));
@@ -249,7 +261,8 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable, Observer
 			pausedText.setText("TAP TO START");
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
-			setTimeText("HIGHSCORE " + formatTime(mGameState.getCurrentHighscore()));
+			setTimeText("HIGHSCORE "
+					+ formatTime(mGameState.getCurrentHighscore()));
 			break;
 		case RUNNING:
 			logo.isVisible(false);
