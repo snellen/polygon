@@ -56,18 +56,18 @@ public class GameController implements IUpdatable, Observer {
 
 	private CollisionDetection collDec = new CollisionDetection();
 	private PolygonAdversary polyAdv = new PolygonAdversary();
-	private GameModel mGameState;
+	private GameModel mGameModel;
 
-	public GameController(GameModel gameState) {
+	public GameController(GameModel gameModel) {
 		super();
 		
-		mGameState = gameState;
-		gameState.getScene().getPlayerModel().isVisible(false);
+		mGameModel = gameModel;
+		gameModel.getScene().getPlayerModel().isVisible(false);
 
-		gameState.setCurrentPhase(IGameModel.Phase.START);
-		gameState.setCameraZ(PAUSE_CAM_POSITION);
+		gameModel.setCurrentPhase(IGameModel.Phase.START);
+		gameModel.setCameraZ(PAUSE_CAM_POSITION);
 		InputHandler.acceptInput(true);
-		gameState.addObserver((Observer) this);
+		gameModel.addObserver((Observer) this);
 	}
 
 	private void updateAngle(long timeElapsed) {
@@ -77,8 +77,8 @@ public class GameController implements IUpdatable, Observer {
 	}
 
 	private boolean moveCamera(long timeElapsed) {
-		float camPosition = mGameState.getCameraZ();
-		float targetPos = mGameState.getCurrentPhase() != IGameModel.Phase.RUNNING ? PAUSE_CAM_POSITION
+		float camPosition = mGameModel.getCameraZ();
+		float targetPos = mGameModel.getCurrentPhase() != IGameModel.Phase.RUNNING ? PAUSE_CAM_POSITION
 				: CAM_POSITION;
 		if (Math.abs(camPosition - targetPos) > 0.0001) {
 			// Move camera towards target position
@@ -94,7 +94,7 @@ public class GameController implements IUpdatable, Observer {
 			} else {
 				camPosition += dPosition;
 			}
-			mGameState.setCameraZ(camPosition);
+			mGameModel.setCameraZ(camPosition);
 			return true;
 		}
 		return false;
@@ -134,24 +134,24 @@ public class GameController implements IUpdatable, Observer {
 
 	public void update(long timeElapsed) {
 
-		Scene theScene = mGameState.getScene();
+		Scene theScene = mGameModel.getScene();
 		
 		boolean cameraMoving = moveCamera(timeElapsed);
-		long totalTime = mGameState.getTotalTime();
+		long totalTime = mGameModel.getTotalTime();
 		long changeDirInterval = totalTime / CHANGEDIR_INTERVAL;
 
 		if (!cameraMoving
-				&& mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING) {
+				&& mGameModel.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 			totalTime += timeElapsed;
-			mGameState.setTotalTime(totalTime);
+			mGameModel.setTotalTime(totalTime);
 			updateColor(timeElapsed);
 			theScene.getCenterPolygonBorder().setColor(mColor);
 		}
 
 		PlayerModel playerModel = theScene.getPlayerModel();
 		float playerAngle = playerModel.getAngle();
-		if (mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING
-				|| mGameState.getCurrentPhase() == IGameModel.Phase.START) {
+		if (mGameModel.getCurrentPhase() == IGameModel.Phase.RUNNING
+				|| mGameModel.getCurrentPhase() == IGameModel.Phase.START) {
 			updateAngle(timeElapsed);
 			// Rotate center
 			theScene.getCenterPolygonBorder().setAngle(mAngle);
@@ -161,14 +161,14 @@ public class GameController implements IUpdatable, Observer {
 			playerModel.setAngle(playerAngle);
 		}
 
-		if (mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING) {
+		if (mGameModel.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 
 			if (changeDirInterval != totalTime / CHANGEDIR_INTERVAL) {
 				rotationSpeed = (float) ((Math.random() * (MAX_ROTATION_SPEED-MIN_ROTATION_SPEED) + MIN_ROTATION_SPEED) * Math
 						.signum(Math.random() - 0.5));
 			}
 
-			if(SPIRALSALLOWED_AFTER < mGameState.getTotalTime())
+			if(SPIRALSALLOWED_AFTER < mGameModel.getTotalTime())
 				polyAdv.setSpiralsAllowed(true);
 			
 			if (!cameraMoving)
@@ -190,14 +190,14 @@ public class GameController implements IUpdatable, Observer {
 				p.setAngle(mAngle);
 			}
 			// Update player
-			playerAngle += mGameState.getPlayerAngluarDir() * PLAYERSPEED
+			playerAngle += mGameModel.getPlayerAngluarDir() * PLAYERSPEED
 					* timeElapsed;
 			playerModel.setAngle(playerAngle);
 
 			// Collision
 			if (collDec.isPlayerCollided(theScene)) {
-				mGameState.updateHighscore(totalTime);
-				mGameState.setCurrentPhase(IGameModel.Phase.GAMEOVER);
+				mGameModel.updateHighscore(totalTime);
+				mGameModel.setCurrentPhase(IGameModel.Phase.GAMEOVER);
 			}
 		}
 	}
@@ -211,17 +211,17 @@ public class GameController implements IUpdatable, Observer {
 		mMaxVisibleRadius = (float) (r.getScreenRadiusZNearRatio() * CAM_POSITION / Math
 				.cos(Math.PI / PolygonModel.NUMBER_OF_VERTICES));
 
-		mGameState.getScene().onMaxVisibleRadiusChanged(mMaxVisibleRadius);
+		mGameModel.getScene().onMaxVisibleRadiusChanged(mMaxVisibleRadius);
 	}
 
-	// Handle changes in GameState
+	// Handle changes in GameModel
 	@Override
 	public void update(Observable arg0, Object arg1) {
 
 		if (arg1 == null)
 			return;
 
-		Scene theScene = mGameState.getScene();
+		Scene theScene = mGameModel.getScene();
 		
 		GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) arg1;
 		if (phaseUpdate.newPhase == GameModel.Phase.RUNNING) {
@@ -245,7 +245,7 @@ public class GameController implements IUpdatable, Observer {
 				p.isVisible(false);
 			}
 			if (phaseUpdate.oldPhase == GameModel.Phase.GAMEOVER) {
-				mGameState.setTotalTime(0);
+				mGameModel.setTotalTime(0);
 			}
 		}
 	}

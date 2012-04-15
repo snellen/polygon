@@ -33,7 +33,7 @@ import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 public class PolygonGame implements Observer, IRenderEventHandler {
 	private Handler mHandler = null;
 
-	private GameModel mGameState = null;
+	private GameModel mGameModel = null;
 	private GameController mGameLogic = null;
 	private PlayerController mGameController = null;
 	private HeadsUpDisplay mHud = null;
@@ -48,7 +48,7 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	}
 
 	// Called when renderer is initialized
-	// Initialize load and init Models, Textures, Gamestate...
+	// Load and initialize Models, Textures, Gamemodel...
 	@Override
 	public void init(IRenderer renderer, Context context) {
 
@@ -56,12 +56,12 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 		SharedPreferences prefs = context
 				.getSharedPreferences(PREFERENCES, 0/* MODE_PRIVATE */);
 
-		mGameState = new GameModel(new Scene(renderer));
-		mGameState.updateHighscore(prefs.getLong(PREFERENCES_BEST, 0));
-		mGameState.addObserver(this);
-		mHud = new HeadsUpDisplay(renderer, context, mGameState);
-		mGameController = new PlayerController(renderer, mGameState);
-		mGameLogic = new GameController(mGameState);
+		mGameModel = new GameModel(new Scene(renderer));
+		mGameModel.updateHighscore(prefs.getLong(PREFERENCES_BEST, 0));
+		mGameModel.addObserver(this);
+		mHud = new HeadsUpDisplay(renderer, context, mGameModel);
+		mGameController = new PlayerController(renderer, mGameModel);
+		mGameLogic = new GameController(mGameModel);
 
 		mHandler = new Handler();
 	}
@@ -77,7 +77,7 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	public void onRender(IRenderer r, long timeElapsed) {
 		mGameLogic.update(timeElapsed);
 		mHud.update(timeElapsed);
-		r.setCameraZ(mGameState.getCameraZ());
+		r.setCameraZ(mGameModel.getCameraZ());
 	}
 
 	/*
@@ -94,8 +94,8 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	}
 
 	public void onPause() {
-		if (mGameState.getCurrentPhase() == GameModel.Phase.RUNNING)
-			mGameState.setCurrentPhase(IGameModel.Phase.PAUSED);
+		if (mGameModel.getCurrentPhase() == GameModel.Phase.RUNNING)
+			mGameModel.setCurrentPhase(IGameModel.Phase.PAUSED);
 	}
 	
 	

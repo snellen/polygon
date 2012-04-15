@@ -31,12 +31,12 @@ public class PlayerController extends InputHandler implements Observer {
 
 	private ImageSprite leftKey;
 	private ImageSprite rightKey;
-	private GameModel mGameState;
+	private GameModel mGameModel;
 
-	public PlayerController(IRenderer r, GameModel gameState) {
+	public PlayerController(IRenderer r, GameModel gameModel) {
 		super();
-		mGameState = gameState;
-		mGameState.addObserver(this);
+		mGameModel = gameModel;
+		mGameModel.addObserver(this);
 
 		leftKey = new ImageSprite(r,R.drawable.key_left);
 		leftKey.setX(0);
@@ -54,22 +54,22 @@ public class PlayerController extends InputHandler implements Observer {
 			final MotionEvent event) {
 
 		if (acceptInput()
-				&& mGameState.getCurrentPhase() == IGameModel.Phase.RUNNING) {
+				&& mGameModel.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 			if (event.getAction() == MotionEvent.ACTION_UP) {
-				mGameState.setPlayerAngularDir(0);
+				mGameModel.setPlayerAngularDir(0);
 			} else {
 				float glX = event.getX() - screenWidth / 2;
 				// float glY = -(event.getY()-screenHeight/2);
-				mGameState.setPlayerAngularDir(glX < 0 ? 1 : -1);
+				mGameModel.setPlayerAngularDir(glX < 0 ? 1 : -1);
 			}
 		} else {
-			mGameState.setPlayerAngularDir(0);
+			mGameModel.setPlayerAngularDir(0);
 		}
 
 		return true;
 	}
 
-	// Handle changes in GameState
+	// Handle changes in GameModel
 	@Override
 	public void update(Observable observable, Object data) {
 		if (data == null)
@@ -87,7 +87,7 @@ public class PlayerController extends InputHandler implements Observer {
 			rightKey.isVisible(false);
 			leftKey.isVisible(false);
 		}
-		mGameState.setPlayerAngularDir(0);
+		mGameModel.setPlayerAngularDir(0);
 	}
 
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {

@@ -46,17 +46,17 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 	private int mScreenWidth;
 	private int mScreenHeight;
 
-	private GameModel mGameState;
+	private GameModel mGameModel;
 
 	private static int DIST_FROM_SIDE = 20;
 	private static int DIST_FROM_TOP = 10;
 	public static int MAX_WIDTH_FROM_TOP = 90;
 
-	public HeadsUpDisplay(IRenderer r, Context context, GameModel gameState) {
+	public HeadsUpDisplay(IRenderer r, Context context, GameModel gameModel) {
 		super();
 
-		mGameState = gameState;
-		mGameState.addObserver(this);
+		mGameModel = gameModel;
+		mGameModel.addObserver(this);
 
 		int background = Color.argb(128, (int) (0.3f * 255),
 				(int) (0.3f * 255), (int) (0.3f * 255));
@@ -74,7 +74,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 		totalTime.setBackgroundColor(Color.TRANSPARENT);
 		totalTime.setTextColor(textColor);
 		totalTime.setText("HIGHSCORE "
-				+ formatTime(mGameState.getCurrentHighscore()));
+				+ formatTime(mGameModel.getCurrentHighscore()));
 		totalTime.setPaddingHorizontal(5);
 		totalTime.setPaddingVertical(5);
 
@@ -122,7 +122,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 
 		if (pauseButton.isVisible() && touchOn(evX, evY, pauseButton)) {
 			if (inputValid)
-				mGameState.setCurrentPhase(IGameModel.Phase.PAUSED);
+				mGameModel.setCurrentPhase(IGameModel.Phase.PAUSED);
 			return true; // Event handled
 		}
 
@@ -134,18 +134,18 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 			}
 		}
 
-		if (mGameState.getCurrentPhase() == IGameModel.Phase.PAUSED
-				|| mGameState.getCurrentPhase() == IGameModel.Phase.START) {
+		if (mGameModel.getCurrentPhase() == IGameModel.Phase.PAUSED
+				|| mGameModel.getCurrentPhase() == IGameModel.Phase.START) {
 			if (inputValid
-					&& (mGameState.getCurrentPhase() == IGameModel.Phase.PAUSED)
+					&& (mGameModel.getCurrentPhase() == IGameModel.Phase.PAUSED)
 					|| startTimer <= 0)
-				mGameState.setCurrentPhase(IGameModel.Phase.RUNNING);
+				mGameModel.setCurrentPhase(IGameModel.Phase.RUNNING);
 			return true;
 		}
 
-		if (mGameState.getCurrentPhase() == IGameModel.Phase.GAMEOVER) {
+		if (mGameModel.getCurrentPhase() == IGameModel.Phase.GAMEOVER) {
 			if (inputValid)
-				mGameState.setCurrentPhase(IGameModel.Phase.START);
+				mGameModel.setCurrentPhase(IGameModel.Phase.START);
 			return true;
 		}
 
@@ -162,7 +162,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 		if (startTimer > 0)
 			startTimer -= timeElapsed;
 
-		if (mGameState.getCurrentPhase() == GameModel.Phase.RUNNING) {
+		if (mGameModel.getCurrentPhase() == GameModel.Phase.RUNNING) {
 			updateTimeDisplay();
 		}
 
@@ -181,7 +181,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 
 	private void updateTimeDisplay() {
 		String timeString;
-		long time = mGameState.getTotalTime();
+		long time = mGameModel.getTotalTime();
 		timeString = "TIME " + formatTime(time);
 		setTimeText(timeString);
 	}
@@ -244,7 +244,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 
 	}
 
-	// Handle changes in GameState
+	// Handle changes in GameModel
 	@Override
 	public void update(Observable observable, Object data) {
 
@@ -262,7 +262,7 @@ public class HeadsUpDisplay extends InputHandler implements IUpdatable,
 			pausedText.setX((mScreenWidth - pausedText.getWidth()) / 2);
 			pauseButton.isVisible(false);
 			setTimeText("HIGHSCORE "
-					+ formatTime(mGameState.getCurrentHighscore()));
+					+ formatTime(mGameModel.getCurrentHighscore()));
 			break;
 		case RUNNING:
 			logo.isVisible(false);
