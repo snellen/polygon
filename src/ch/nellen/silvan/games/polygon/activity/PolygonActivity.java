@@ -86,8 +86,6 @@ public class PolygonActivity extends Activity {
 			}
 		});
 		setContentView(mGLView);
-
-		musicPlayer.start();
 	}
 
 	@Override

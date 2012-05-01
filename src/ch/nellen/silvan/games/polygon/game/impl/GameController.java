@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import java.util.Observable;
@@ -41,10 +41,9 @@ public class GameController implements IUpdatable, Observer {
 	private static final float CAM_POSITION = 5f;
 	private static final float CAM_SPEED = 4f / 1000;
 
-	private static final float PLAYERSPEED = 0.45f;
 	private static float MAX_ROTATION_SPEED = 0.16f;
 	private static float MIN_ROTATION_SPEED = 0.10f;
-	
+
 	private float shrinkSpeed = 2.2f / 1000;
 	private float rotationSpeed = MIN_ROTATION_SPEED;
 
@@ -60,7 +59,7 @@ public class GameController implements IUpdatable, Observer {
 
 	public GameController(GameModel gameModel) {
 		super();
-		
+
 		mGameModel = gameModel;
 		gameModel.getScene().getPlayerModel().isVisible(false);
 
@@ -101,8 +100,9 @@ public class GameController implements IUpdatable, Observer {
 	}
 
 	private int targetColorIndex = 0;
-	private RGBAColor colorV = new RGBAColor(COLORS[targetColorIndex].r - mColor.r,
-			COLORS[targetColorIndex].g - mColor.g, COLORS[targetColorIndex].b - mColor.b,
+	private RGBAColor colorV = new RGBAColor(COLORS[targetColorIndex].r
+			- mColor.r, COLORS[targetColorIndex].g - mColor.g,
+			COLORS[targetColorIndex].b - mColor.b,
 			COLORS[targetColorIndex].alpha - mColor.alpha);
 
 	private void updateColor(long timeElapsed) {
@@ -135,7 +135,7 @@ public class GameController implements IUpdatable, Observer {
 	public void update(long timeElapsed) {
 
 		Scene theScene = mGameModel.getScene();
-		
+
 		boolean cameraMoving = moveCamera(timeElapsed);
 		long totalTime = mGameModel.getTotalTime();
 		long changeDirInterval = totalTime / CHANGEDIR_INTERVAL;
@@ -164,13 +164,14 @@ public class GameController implements IUpdatable, Observer {
 		if (mGameModel.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 
 			if (changeDirInterval != totalTime / CHANGEDIR_INTERVAL) {
-				rotationSpeed = (float) ((Math.random() * (MAX_ROTATION_SPEED-MIN_ROTATION_SPEED) + MIN_ROTATION_SPEED) * Math
+				rotationSpeed = (float) ((Math.random()
+						* (MAX_ROTATION_SPEED - MIN_ROTATION_SPEED) + MIN_ROTATION_SPEED) * Math
 						.signum(Math.random() - 0.5));
 			}
 
-			if(SPIRALSALLOWED_AFTER < mGameModel.getTotalTime())
+			if (SPIRALSALLOWED_AFTER < mGameModel.getTotalTime())
 				polyAdv.setSpiralsAllowed(true);
-			
+
 			if (!cameraMoving)
 				updateMaxRadius(timeElapsed);
 
@@ -190,8 +191,7 @@ public class GameController implements IUpdatable, Observer {
 				p.setAngle(mAngle);
 			}
 			// Update player
-			playerAngle += mGameModel.getPlayerAngluarDir() * PLAYERSPEED
-					* timeElapsed;
+			playerAngle += mGameModel.getPlayerSpeed() * timeElapsed;
 			playerModel.setAngle(playerAngle);
 
 			// Collision
@@ -207,9 +207,11 @@ public class GameController implements IUpdatable, Observer {
 				* timeElapsed);
 	}
 
-	public void onSurfaceChanged(IRenderer r, int mScreenWidth, int mScreenHeight) {
-		mMaxVisibleRadius = (float) (r.getScreenRadiusZNearRatio() * CAM_POSITION / Math
-				.cos(Math.PI / PolygonModel.NUMBER_OF_VERTICES));
+	public void onSurfaceChanged(IRenderer r, int mScreenWidth,
+			int mScreenHeight) {
+		mMaxVisibleRadius = (float) (r.getScreenRadiusZNearRatio()
+				* CAM_POSITION / Math.cos(Math.PI
+				/ PolygonModel.NUMBER_OF_VERTICES));
 
 		mGameModel.getScene().onMaxVisibleRadiusChanged(mMaxVisibleRadius);
 	}
@@ -222,7 +224,7 @@ public class GameController implements IUpdatable, Observer {
 			return;
 
 		Scene theScene = mGameModel.getScene();
-		
+
 		GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) arg1;
 		if (phaseUpdate.newPhase == GameModel.Phase.RUNNING) {
 			theScene.getPlayerModel().isVisible(true);

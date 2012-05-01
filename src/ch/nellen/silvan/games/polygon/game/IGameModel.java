@@ -28,9 +28,9 @@ public interface IGameModel {
 		public Phase newPhase;
 	}
 
-	public abstract void setPlayerAngularDir(int mAngularDir);
+	public abstract void setPlayerSpeed(float speed);
 
-	public abstract int getPlayerAngluarDir();
+	public abstract float getPlayerSpeed();
 
 	public abstract void setTotalTime(long time);
 

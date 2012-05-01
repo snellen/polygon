@@ -29,6 +29,8 @@ import ch.nellen.silvan.games.polygon.graphics.impl.ImageSprite;
 
 public class PlayerInputHandler extends InputHandler implements Observer {
 
+	private static final float PLAYERSPEED = 0.45f;
+	
 	private ImageSprite leftKey;
 	private ImageSprite rightKey;
 	private GameModel mGameModel;
@@ -56,14 +58,14 @@ public class PlayerInputHandler extends InputHandler implements Observer {
 		if (acceptInput()
 				&& mGameModel.getCurrentPhase() == IGameModel.Phase.RUNNING) {
 			if (event.getAction() == MotionEvent.ACTION_UP) {
-				mGameModel.setPlayerAngularDir(0);
+				mGameModel.setPlayerSpeed(0);
 			} else {
 				float glX = event.getX() - screenWidth / 2;
 				// float glY = -(event.getY()-screenHeight/2);
-				mGameModel.setPlayerAngularDir(glX < 0 ? 1 : -1);
+				mGameModel.setPlayerSpeed(glX < 0 ? PLAYERSPEED : -PLAYERSPEED);
 			}
 		} else {
-			mGameModel.setPlayerAngularDir(0);
+			mGameModel.setPlayerSpeed(0);
 		}
 
 		return true;
@@ -87,7 +89,7 @@ public class PlayerInputHandler extends InputHandler implements Observer {
 			rightKey.isVisible(false);
 			leftKey.isVisible(false);
 		}
-		mGameModel.setPlayerAngularDir(0);
+		mGameModel.setPlayerSpeed(0);
 	}
 
 	public void onSurfaceChanged(int screenWidth, int screenHeight) {

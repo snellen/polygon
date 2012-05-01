@@ -27,7 +27,7 @@ import ch.nellen.silvan.games.polygon.game.IGameModel;
  * */
 public class GameModel extends Observable implements IGameModel {
 
-	private int mAngularDir = 0;
+	private float mPlayerSpeed = 0;
 	private long mTimeElapsed;
 	private long mHighscore = 0;
 	private float mCameraZ;
@@ -62,13 +62,13 @@ public class GameModel extends Observable implements IGameModel {
 		}
 	}
 
-	public void setPlayerAngularDir(int mAngularDir) {
-		this.mAngularDir = mAngularDir;
+	public void setPlayerSpeed(float speed) {
+		this.mPlayerSpeed = speed;
 	}
 
 	@Override
-	public int getPlayerAngluarDir() {
-		return mAngularDir;
+	public float getPlayerSpeed() {
+		return mPlayerSpeed;
 	}
 
 	@Override
