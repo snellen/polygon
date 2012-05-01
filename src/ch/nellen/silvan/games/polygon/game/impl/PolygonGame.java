@@ -29,16 +29,17 @@ import ch.nellen.silvan.games.polygon.game.IGameModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderEventHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
 
-// To keep all game specific code in one place...
 public class PolygonGame implements Observer, IRenderEventHandler {
 	private Handler mHandler = null;
 
 	private GameModel mGameModel = null;
-	private GameController mGameLogic = null;
-	private PlayerController mGameController = null;
+	private GameController mGameController = null;
+	private PlayerInputHandler mPlayerInputHandler = null;
 	private HeadsUpDisplay mHud = null;
 
 	private Context mContext;
+	private Runnable mGameStartedCallback = null;
+	private Runnable mGameoverCallback = null;
 
 	private static final String PREFERENCES = PolygonGame.class.getName();
 	private static final String PREFERENCES_BEST = "POLYGONBESTTIME";
@@ -60,8 +61,8 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 		mGameModel.updateHighscore(prefs.getLong(PREFERENCES_BEST, 0));
 		mGameModel.addObserver(this);
 		mHud = new HeadsUpDisplay(renderer, context, mGameModel);
-		mGameController = new PlayerController(renderer, mGameModel);
-		mGameLogic = new GameController(mGameModel);
+		mPlayerInputHandler = new PlayerInputHandler(renderer, mGameModel);
+		mGameController = new GameController(mGameModel);
 
 		mHandler = new Handler();
 	}
@@ -75,7 +76,7 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	 */
 	@Override
 	public void onRender(IRenderer r, long timeElapsed) {
-		mGameLogic.update(timeElapsed);
+		mGameController.update(timeElapsed);
 		mHud.update(timeElapsed);
 		r.setCameraZ(mGameModel.getCameraZ());
 	}
@@ -89,8 +90,8 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	@Override
 	public void onSurfaceChanged(IRenderer r, int width, int height) {
 		mHud.onSurfaceChanged(width, height);
-		mGameController.onSurfaceChanged(width, height);
-		mGameLogic.onSurfaceChanged(r, width, height);
+		mPlayerInputHandler.onSurfaceChanged(width, height);
+		mGameController.onSurfaceChanged(r, width, height);
 	}
 
 	public void onPause() {
@@ -102,7 +103,15 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	public void handleTouchEvent(float screenWidth, float screenHeight,
 			MotionEvent event) {
 		if (!mHud.handleMotionEvent(screenWidth, screenHeight, event))
-			mGameController.handleMotionEvent(screenWidth, screenHeight, event);
+			mPlayerInputHandler.handleMotionEvent(screenWidth, screenHeight, event);
+	}
+
+	public void setGameStartedCallback(Runnable mGameStartedCallback) {
+		this.mGameStartedCallback = mGameStartedCallback;
+	}
+
+	public void setGameoverCallback(Runnable mGameoverCallback) {
+		this.mGameoverCallback = mGameoverCallback;
 	}
 
 	@Override
@@ -120,7 +129,16 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 					editor.commit();
 				}
 			});
+		} else {
+			GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) arg1;
+			if(phaseUpdate.newPhase == GameModel.Phase.RUNNING && phaseUpdate.oldPhase == GameModel.Phase.START && mGameStartedCallback != null) {
+				mHandler.post(mGameStartedCallback);
+			}
+			if(phaseUpdate.newPhase == GameModel.Phase.GAMEOVER && mGameoverCallback != null) {
+				mHandler.post(mGameoverCallback);
+			}
 		}
+		
 	}
 
 }

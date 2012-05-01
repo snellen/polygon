@@ -14,20 +14,19 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 package ch.nellen.silvan.games.polygon.activity;
 
-import ch.nellen.silvan.games.R;
 import android.app.Activity;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import ch.nellen.silvan.games.R;
 
 public class PolygonActivity extends Activity {
-	private GLSurfaceView mGLView;
+	private PolygonView mGLView;
 
 	private class InfiniteLoopMusicPlayer {
 
@@ -36,7 +35,7 @@ public class PolygonActivity extends Activity {
 		protected void start() {
 			if (mMediaPlayer == null) {
 				mMediaPlayer = MediaPlayer.create(getApplicationContext(),
-						R.raw.backgroundmusic1);
+						R.raw.background_music);
 				// no need to call prepare();
 				// create() does that for you
 				mMediaPlayer.setLooping(true);
@@ -74,6 +73,18 @@ public class PolygonActivity extends Activity {
 		// Create a GLSurfaceView instance and set it
 		// as the ContentView for this Activity.
 		mGLView = new PolygonView(this);
+		mGLView.setGameStartedCallback(new Runnable() {
+			@Override
+			public void run() {
+				musicPlayer.start();
+			}
+		});
+		mGLView.setGameoverCallback(new Runnable() {
+			@Override
+			public void run() {
+				musicPlayer.pause();
+			}
+		});
 		setContentView(mGLView);
 
 		musicPlayer.start();

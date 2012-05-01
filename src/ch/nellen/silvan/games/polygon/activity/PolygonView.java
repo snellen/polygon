@@ -58,10 +58,16 @@ public class PolygonView extends GLSurfaceView {
 		super.onPause();
 		queueEvent(new Runnable() {
 			public void run() {
-				mGame.onPause();
+				mRenderer.onPause();
 			}
 		});
 	}
 	
-	
+	public void setGameStartedCallback(Runnable callback) {
+		mGame.setGameStartedCallback(callback);
+	}
+
+	public void setGameoverCallback(Runnable callback) {
+		mGame.setGameoverCallback(callback);
+	}
 }
