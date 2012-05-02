@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 package ch.nellen.silvan.games.polygon.game.impl;
 
 import java.util.Observable;
@@ -28,6 +28,7 @@ import android.view.MotionEvent;
 import ch.nellen.silvan.games.polygon.game.IGameModel;
 import ch.nellen.silvan.games.polygon.graphics.IRenderEventHandler;
 import ch.nellen.silvan.games.polygon.graphics.IRenderer;
+import ch.nellen.silvan.games.polygon.sound.SoundManager;
 
 public class PolygonGame implements Observer, IRenderEventHandler {
 	private Handler mHandler = null;
@@ -37,9 +38,9 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	private PlayerInputHandler mPlayerInputHandler = null;
 	private HeadsUpDisplay mHud = null;
 
+	private SoundManager mSoundManager = null;
+
 	private Context mContext;
-	private Runnable mGameStartedCallback = null;
-	private Runnable mGameoverCallback = null;
 
 	private static final String PREFERENCES = PolygonGame.class.getName();
 	private static final String PREFERENCES_BEST = "POLYGONBESTTIME";
@@ -49,7 +50,7 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	}
 
 	// Called when renderer is initialized
-	// Load and initialize Models, Textures, Gamemodel...
+	// Load and initialize Models, Textures, Game Model...
 	@Override
 	public void init(IRenderer renderer, Context context) {
 
@@ -65,6 +66,8 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 		mGameController = new GameController(mGameModel);
 
 		mHandler = new Handler();
+
+		mSoundManager = new SoundManager(context);
 	}
 
 	/*
@@ -97,21 +100,23 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 	public void onPause() {
 		if (mGameModel.getCurrentPhase() == GameModel.Phase.RUNNING)
 			mGameModel.setCurrentPhase(IGameModel.Phase.PAUSED);
+		mSoundManager.pauseBackgroundMusic();
 	}
-	
-	
+
+	public void onResume() {
+		if (mSoundManager.isBackgroundMusicPaused())
+			mSoundManager.resumeBackgroundMusic();
+	}
+
+	public void onStop() {
+		mSoundManager.stop();
+	}
+
 	public void handleTouchEvent(float screenWidth, float screenHeight,
 			MotionEvent event) {
 		if (!mHud.handleMotionEvent(screenWidth, screenHeight, event))
-			mPlayerInputHandler.handleMotionEvent(screenWidth, screenHeight, event);
-	}
-
-	public void setGameStartedCallback(Runnable mGameStartedCallback) {
-		this.mGameStartedCallback = mGameStartedCallback;
-	}
-
-	public void setGameoverCallback(Runnable mGameoverCallback) {
-		this.mGameoverCallback = mGameoverCallback;
+			mPlayerInputHandler.handleMotionEvent(screenWidth, screenHeight,
+					event);
 	}
 
 	@Override
@@ -131,14 +136,15 @@ public class PolygonGame implements Observer, IRenderEventHandler {
 			});
 		} else {
 			GameModel.PhaseChange phaseUpdate = (GameModel.PhaseChange) arg1;
-			if(phaseUpdate.newPhase == GameModel.Phase.RUNNING && phaseUpdate.oldPhase == GameModel.Phase.START && mGameStartedCallback != null) {
-				mHandler.post(mGameStartedCallback);
+			if (phaseUpdate.newPhase == GameModel.Phase.RUNNING
+					&& phaseUpdate.oldPhase == GameModel.Phase.START) {
+				mSoundManager.resumeBackgroundMusic();
 			}
-			if(phaseUpdate.newPhase == GameModel.Phase.GAMEOVER && mGameoverCallback != null) {
-				mHandler.post(mGameoverCallback);
+			if (phaseUpdate.newPhase == GameModel.Phase.GAMEOVER) {
+				mSoundManager.playExplosionSound();
+				mSoundManager.pauseBackgroundMusic();
 			}
 		}
-		
-	}
 
+	}
 }

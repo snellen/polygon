@@ -19,47 +19,14 @@ package ch.nellen.silvan.games.polygon.activity;
 
 import android.app.Activity;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
-import ch.nellen.silvan.games.R;
 
 public class PolygonActivity extends Activity {
 	private PolygonView mGLView;
 
-	private class InfiniteLoopMusicPlayer {
-
-		private MediaPlayer mMediaPlayer;
-
-		protected void start() {
-			if (mMediaPlayer == null) {
-				mMediaPlayer = MediaPlayer.create(getApplicationContext(),
-						R.raw.background_music);
-				// no need to call prepare();
-				// create() does that for you
-				mMediaPlayer.setLooping(true);
-			}
-			if (!mMediaPlayer.isPlaying())
-				mMediaPlayer.start();
-			setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		}
-
-		protected void pause() {
-			if (mMediaPlayer != null && mMediaPlayer.isPlaying())
-				mMediaPlayer.pause();
-		}
-
-		protected void terminate() {
-			if (mMediaPlayer != null) {
-				mMediaPlayer.release();
-				mMediaPlayer = null;
-			}
-			setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-		}
-	}
-
-	InfiniteLoopMusicPlayer musicPlayer = new InfiniteLoopMusicPlayer();
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -73,18 +40,6 @@ public class PolygonActivity extends Activity {
 		// Create a GLSurfaceView instance and set it
 		// as the ContentView for this Activity.
 		mGLView = new PolygonView(this);
-		mGLView.setGameStartedCallback(new Runnable() {
-			@Override
-			public void run() {
-				musicPlayer.start();
-			}
-		});
-		mGLView.setGameoverCallback(new Runnable() {
-			@Override
-			public void run() {
-				musicPlayer.pause();
-			}
-		});
 		setContentView(mGLView);
 	}
 
@@ -96,7 +51,7 @@ public class PolygonActivity extends Activity {
 		// you should consider de-allocating objects that
 		// consume significant memory here.
 		mGLView.onPause();
-		musicPlayer.pause();
+		setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
 	}
 
 	@Override
@@ -106,12 +61,12 @@ public class PolygonActivity extends Activity {
 		// If you de-allocated graphic objects for onPause()
 		// this is a good place to re-allocate them.
 		mGLView.onResume();
-		musicPlayer.start();
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 
 	@Override
 	protected void onStop() {
-		musicPlayer.terminate();
 		super.onStop();
+		mGLView.onStop();
 	}
 }

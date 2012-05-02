@@ -213,9 +213,4 @@ public class PolygonRenderer implements GLSurfaceView.Renderer, IRenderer {
 	public float getScreenRadiusZNearRatio() {
 		return mScreenRadiusZNearRatio;
 	}
-
-	public void onPause() {
-		mEventHandler.onPause();
-	}
-
 }

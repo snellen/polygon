@@ -25,8 +25,6 @@ public interface IRenderEventHandler {
 	
 	public abstract void onRender(IRenderer r, long timeElapsed);
 
-	public abstract void onPause();
-
 	public abstract void onSurfaceChanged(IRenderer r, int width, int height);
 
 }
